@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom"
+import Welcome from "../assets/welcome.svg"
 
 const Home = () => {
   let navigate = useNavigate()
