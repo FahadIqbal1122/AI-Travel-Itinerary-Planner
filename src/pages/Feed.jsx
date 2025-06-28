@@ -2,7 +2,9 @@ import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { GetPosts } from "../services/PostServices"
 
-const Feed = () => {
+const Feed = ({ user }) => {
+  let navigate = useNavigate()
+
   const [posts, setPosts] = useState([])
 
   useEffect(() => {

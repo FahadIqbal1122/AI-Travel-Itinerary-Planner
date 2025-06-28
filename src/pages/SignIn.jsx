@@ -1,6 +1,10 @@
 import { useState } from "react"
+import { useNavigate } from "react-router-dom"
+import { SignInUser } from "../services/Auth"
 
-const SignIn = () => {
+const SignIn = ({ setUser }) => {
+  let navigate = useNavigate()
+
   const [formValues, setFormValues] = useState({ email: "", password: "" })
 
   const handleChange = (e) => {
@@ -9,6 +13,10 @@ const SignIn = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    const payload = await SignInUser(formValues)
+    setFormValues({ email: "", password: "" })
+    setUser(payload)
+    navigate("/feed")
   }
 
   return (
