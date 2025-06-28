@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react"
+import { useNavigate } from "react-router-dom"
 import { GetPosts } from "../services/PostServices"
 
 const Feed = () => {
@@ -12,7 +13,7 @@ const Feed = () => {
     handlePosts()
   }, [])
 
-  return (
+  return user ? (
     <div className="grid col-4">
       {posts.map((post) => (
         <div className="card" key={post.id}>
@@ -27,6 +28,11 @@ const Feed = () => {
           )}
         </div>
       ))}
+    </div>
+  ) : (
+    <div className="protected">
+      <h3>Oops! You must be signed in to do that!</h3>
+      <button onClick={() => navigate("/signin")}>Sign In</button>
     </div>
   )
 }
