@@ -1,6 +1,5 @@
 import Client from "./api"
 
-// Make sure this matches what you're importing
 export const GetItineraries = async (userId) => {
   try {
     const res = await Client.get(`/itineraries/user/${userId}`)
@@ -11,7 +10,6 @@ export const GetItineraries = async (userId) => {
   }
 }
 
-// If you're using the user-specific version, it should be:
 export const GetUserItineraries = async (userId) => {
   try {
     const token = localStorage.getItem("token")
@@ -31,7 +29,6 @@ export const GetUserItineraries = async (userId) => {
   }
 }
 
-// Export both if needed
 export default {
   GetItineraries,
   GetUserItineraries,

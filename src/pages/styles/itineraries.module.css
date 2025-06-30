@@ -1,0 +1,119 @@
+.container {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+.loading,
+.error {
+  text-align: center;
+  padding: 2rem;
+  font-size: 1.2rem;
+}
+
+.error {
+  color: #dc3545;
+}
+
+.emptyState {
+  text-align: center;
+  padding: 3rem;
+  background: #f8f9fa;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.emptyState h3 {
+  font-size: 1.5rem;
+  color: #343a40;
+  margin-bottom: 1rem;
+}
+
+.emptyState p {
+  color: #6c757d;
+  margin-bottom: 1.5rem;
+}
+
+.createBtn {
+  background: #007bff;
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 50px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.createBtn:hover {
+  background: #0069d9;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.itineraryList {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+}
+
+.itineraryCard {
+  background: white;
+  border-radius: 10px;
+  padding: 1.5rem;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  border-left: 4px solid #007bff;
+}
+
+.itineraryCard:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.itineraryCard h3 {
+  color: #343a40;
+  margin-bottom: 0.5rem;
+  font-size: 1.25rem;
+}
+
+.dateRange {
+  display: flex;
+  gap: 0.5rem;
+  margin: 1rem 0;
+}
+
+.dateBadge {
+  background: #e9ecef;
+  padding: 0.25rem 0.75rem;
+  border-radius: 50px;
+  font-size: 0.85rem;
+  color: #495057;
+}
+
+.activities {
+  margin-top: 1rem;
+}
+
+.activityItem {
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #e9ecef;
+  display: flex;
+  justify-content: space-between;
+}
+
+.activityTime {
+  font-weight: 600;
+  color: #007bff;
+}
+
+@media (max-width: 768px) {
+  .itineraryList {
+    grid-template-columns: 1fr;
+  }
+
+  .container {
+    padding: 0 0.5rem;
+  }
+}
