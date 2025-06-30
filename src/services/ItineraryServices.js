@@ -1,35 +1,37 @@
 import Client from "./api"
 
-export const GetItineraries = async (userId) => {
+export const GetUserItineraries = async (userId) => {
   try {
-    const res = await Client.get(`/itineraries/user/${userId}`)
-    return res.data
+    const response = await Client.get(`/itineraries/user/${userId}`)
+    return response.data
   } catch (error) {
-    console.error("Error fetching itineraries:", error)
+    console.error("Error in GetUserItineraries:", error)
     throw error
   }
 }
 
-export const GetUserItineraries = async (userId) => {
+export const GetItineraryById = async (itineraryId) => {
   try {
-    const token = localStorage.getItem("token")
-    const res = await Client.get(`/itineraries/user/${userId}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
-    return res.data
+    const response = await Client.get(`/itineraries/${itineraryId}`)
+    return response.data
   } catch (error) {
-    console.error("Error details:", {
-      status: error.response?.status,
-      data: error.response?.data,
-      headers: error.response?.headers,
-    })
+    console.error("Error in GetItineraryById:", error)
+    throw error
+  }
+}
+
+export const CreateItinerary = async (data) => {
+  try {
+    const response = await Client.post("/itineraries", data)
+    return response.data
+  } catch (error) {
+    console.error("Error in CreateItinerary:", error)
     throw error
   }
 }
 
 export default {
-  GetItineraries,
   GetUserItineraries,
+  GetItineraryById,
+  CreateItinerary,
 }

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, Link } from "react-router-dom"
 import { GetUserItineraries } from "../services/ItineraryServices"
 import styles from "./styles/itineraries.module.css"
 
@@ -50,31 +50,39 @@ const Itinerary = ({ user }) => {
       ) : (
         <div className={styles.itineraryList}>
           {itineraries.map((itinerary) => (
-            <div key={itinerary._id} className={styles.itineraryCard}>
-              <h3>{itinerary.destination}</h3>
-              <div className={styles.dateRange}>
-                <span className={styles.dateBadge}>
-                  {new Date(itinerary.startDate).toLocaleDateString()}
-                </span>
-                <span>→</span>
-                <span className={styles.dateBadge}>
-                  {new Date(itinerary.endDate).toLocaleDateString()}
-                </span>
-              </div>
-              {itinerary.activities?.length > 0 && (
-                <div className={styles.activities}>
-                  <h4>Activities</h4>
-                  {itinerary.activities.slice(0, 3).map((activity, i) => (
-                    <div key={i} className={styles.activityItem}>
-                      <span>{activity.title}</span>
-                      <span className={styles.activityTime}>
-                        {activity.time}
-                      </span>
-                    </div>
-                  ))}
+            <Link
+              to={`/itineraries/${itinerary._id}`}
+              key={itinerary._id}
+              className={styles.cardLink}
+            >
+              <div className={styles.itineraryCard}>
+                <h3>{itinerary.destination}</h3>
+                <div className={styles.dateRange}>
+                  <span className={styles.dateBadge}>
+                    {new Date(itinerary.startDate).toLocaleDateString()}
+                  </span>
+                  <span>→</span>
+                  <span className={styles.dateBadge}>
+                    {new Date(itinerary.endDate).toLocaleDateString()}
+                  </span>
                 </div>
-              )}
-            </div>
+                {itinerary.activities?.length > 0 && (
+                  <div className={styles.activities}>
+                    <h4>Activities Preview</h4>
+                    {itinerary.activities.slice(0, 3).map((activity, i) => (
+                      <div key={i} className={styles.activityItem}>
+                        <span>{activity.title}</span>
+                        {activity.time && (
+                          <span className={styles.activityTime}>
+                            {activity.time}
+                          </span>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </Link>
           ))}
         </div>
       )}

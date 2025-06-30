@@ -68,8 +68,8 @@
 }
 
 .itineraryCard:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  transform: none;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
 }
 
 .itineraryCard h3 {
@@ -116,4 +116,14 @@
   .container {
     padding: 0 0.5rem;
   }
+}
+
+.cardLink {
+  text-decoration: none;
+  color: inherit;
+}
+
+.cardLink:hover .itineraryCard {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }

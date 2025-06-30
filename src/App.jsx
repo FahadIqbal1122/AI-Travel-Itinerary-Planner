@@ -5,6 +5,7 @@ import Nav from "./components/Nav"
 import Register from "./pages/Register"
 import SignIn from "./pages/SignIn"
 import Itinerary from "./pages/Itinerary"
+import ItineraryDetail from "./pages/ItineraryDetail"
 import Home from "./pages/Home"
 import "./App.css"
 
@@ -35,13 +36,14 @@ const App = () => {
 
   return (
     <div className="App">
-      <Nav user={user} handleLogOut={handleLogOut} />{" "}
+      <Nav user={user} handleLogOut={handleLogOut} />
       <main>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/signin" element={<SignIn setUser={setUser} />} />
           <Route path="/register" element={<Register />} />
-          <Route path="/itinerary" element={<Itinerary user={user} />} />{" "}
+          <Route path="/itinerary" element={<Itinerary user={user} />} />
+          <Route path="/itineraries/:id" element={<ItineraryDetail />} />
         </Routes>
       </main>
     </div>
