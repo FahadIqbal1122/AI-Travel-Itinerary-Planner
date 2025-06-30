@@ -4,7 +4,7 @@ import { CheckSession } from "./services/Auth"
 import Nav from "./components/Nav"
 import Register from "./pages/Register"
 import SignIn from "./pages/SignIn"
-import Feed from "./pages/Feed"
+import Itinerary from "./pages/Itinerary"
 import Home from "./pages/Home"
 import "./App.css"
 
@@ -18,26 +18,30 @@ const App = () => {
   }
 
   const checkToken = async () => {
-    const user = await CheckSession()
-    setUser(user)
+    try {
+      const userData = await CheckSession()
+      setUser(userData) // Make sure this is the full user object
+      console.log("User set:", userData) // Debug log
+    } catch (error) {
+      console.error("Session check failed:", error)
+      localStorage.removeItem("token")
+    }
   }
 
   useEffect(() => {
     const token = localStorage.getItem("token")
-    if (token) {
-      checkToken()
-    }
+    if (token) checkToken()
   }, [])
 
   return (
     <div className="App">
-      <Nav user={user} handleLogOut={handleLogOut} />
+      <Nav user={user} handleLogOut={handleLogOut} />{" "}
       <main>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/signin" element={<SignIn setUser={setUser} />} />
           <Route path="/register" element={<Register />} />
-          <Route path="/feed" element={<Feed user={user} />} />
+          <Route path="/itinerary" element={<Itinerary user={user} />} />{" "}
         </Routes>
       </main>
     </div>
