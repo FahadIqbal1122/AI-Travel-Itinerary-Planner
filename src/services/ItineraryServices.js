@@ -30,8 +30,19 @@ export const CreateItinerary = async (data) => {
   }
 }
 
+export const GenerateItinerary = async (data) => {
+  try {
+    const response = await Client.post("/itineraries/generate", data)
+    return response.data
+  } catch (error) {
+    console.error("Error in GenerateItinerary:", error)
+    throw error
+  }
+}
+
 export default {
   GetUserItineraries,
   GetItineraryById,
   CreateItinerary,
+  GenerateItinerary,
 }

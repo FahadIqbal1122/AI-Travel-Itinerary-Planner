@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react"
 import { useNavigate, Link } from "react-router-dom"
 import { GetUserItineraries } from "../services/ItineraryServices"
+import GenerateItineraryModal from "../components/GenerateItineraryModal"
 import styles from "./styles/itineraries.module.css"
 
 const Itinerary = ({ user }) => {
@@ -8,6 +9,7 @@ const Itinerary = ({ user }) => {
   const [itineraries, setItineraries] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [showGenerateModal, setShowGenerateModal] = useState(false)
 
   useEffect(() => {
     const fetchUserItineraries = async () => {
@@ -34,8 +36,40 @@ const Itinerary = ({ user }) => {
     return <div className={styles.loading}>Loading your trips...</div>
   if (error) return <div className={styles.error}>Error: {error}</div>
 
+  const handleGenerateSuccess = (newItinerary) => {
+    setItineraries([newItinerary, ...itineraries])
+  }
+
   return (
     <div className={styles.container}>
+      {/* header with action buttons */}
+      <div className={styles.header}>
+        <h2>Your Trips</h2>
+        <div className={styles.actionButtons}>
+          <button
+            onClick={() => navigate("/create-itinerary")}
+            className={styles.createBtn}
+          >
+            Create Manually
+          </button>
+          <button
+            onClick={() => setShowGenerateModal(true)}
+            className={styles.generateBtn}
+          >
+            Generate with AI
+          </button>
+        </div>
+      </div>
+
+      {/* Modal */}
+      {showGenerateModal && (
+        <GenerateItineraryModal
+          userId={user._id}
+          onClose={() => setShowGenerateModal(false)}
+          onSuccess={handleGenerateSuccess}
+        />
+      )}
+
       {itineraries.length === 0 ? (
         <div className={styles.emptyState}>
           <h3>No itineraries found</h3>
