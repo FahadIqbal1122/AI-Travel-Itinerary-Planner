@@ -1,8 +1,10 @@
 import { useState } from "react"
+import { useNavigate } from "react-router-dom"
 import { GenerateItinerary } from "../services/ItineraryServices"
 import styles from "./styles/generateItineraryModal.module.css"
 
-const GenerateItineraryModal = ({ userId, onClose, onSuccess }) => {
+const GenerateItineraryModal = ({ user, onClose, onSuccess }) => {
+  const navigate = useNavigate()
   const [formData, setFormData] = useState({
     destination: "",
     startDate: "",
@@ -15,18 +17,32 @@ const GenerateItineraryModal = ({ userId, onClose, onSuccess }) => {
   const handleSubmit = async (e) => {
     e.preventDefault()
     try {
-      setLoading(true)
-      const itinerary = await GenerateItinerary({
+      const response = await GenerateItinerary({
         ...formData,
-        userId, // Pass the user ID from props
+        userId: user._id,
+        isDraft: true,
       })
-      onSuccess(itinerary) // Refresh the list
-      onClose()
+
+      console.log("API Response:", response)
+
+      if (response.draft) {
+        navigate("/itineraries/generate/edit", {
+          state: {
+            draft: response.draft,
+            metadata: response.metadata,
+          },
+        })
+      } else {
+        throw new Error("No draft data received")
+      }
     } catch (err) {
-      setError(err.message || "Failed to generate itinerary")
-    } finally {
-      setLoading(false)
+      console.error("Navigation failed:", err)
+      setError(err.message)
     }
+  }
+
+  const handleCloseModal = () => {
+    onClose()
   }
 
   return (

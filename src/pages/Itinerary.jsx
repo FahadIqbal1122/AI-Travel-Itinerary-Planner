@@ -40,9 +40,16 @@ const Itinerary = ({ user }) => {
     setItineraries([newItinerary, ...itineraries])
   }
 
+  const handleGenerateClick = () => {
+    navigate("/generate", {
+      state: {
+        user: user,
+      },
+    })
+  }
+
   return (
     <div className={styles.container}>
-      {/* header with action buttons */}
       <div className={styles.header}>
         <h2>Your Trips</h2>
         <div className={styles.actionButtons}>
@@ -53,7 +60,7 @@ const Itinerary = ({ user }) => {
             Create Manually
           </button>
           <button
-            onClick={() => setShowGenerateModal(true)}
+            onClick={() => handleGenerateClick(true)}
             className={styles.generateBtn}
           >
             Generate with AI

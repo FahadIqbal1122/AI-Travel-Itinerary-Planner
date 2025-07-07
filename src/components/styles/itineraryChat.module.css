@@ -1,0 +1,241 @@
+.editorContainer {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.daySelector {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #eaeaea;
+  overflow-x: auto;
+}
+
+.dayTab {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  background: #f5f5f5;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  font-size: 0.95rem;
+}
+
+.dayTab:hover {
+  background: #e0e0e0;
+}
+
+.activeTab {
+  background: #007bff;
+  color: white;
+}
+
+.dayEditor {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  padding: 2rem;
+  margin-bottom: 2rem;
+}
+
+.dayHeader {
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.dayHeader h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: #333;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.dayMeta {
+  display: flex;
+  gap: 1.5rem;
+  margin-top: 0.5rem;
+  color: #666;
+  font-size: 0.95rem;
+}
+
+.dayContent {
+  margin-top: 1.5rem;
+}
+
+.description {
+  margin-bottom: 2rem;
+  line-height: 1.6;
+  color: #444;
+}
+
+.timeSlots {
+  display: grid;
+  gap: 2rem;
+}
+
+.timeSlot {
+  background: #f9f9f9;
+  padding: 1.5rem;
+  border-radius: 8px;
+}
+
+.timeSlot h3 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  color: #007bff;
+  font-size: 1.1rem;
+}
+
+.slotContent {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.slotContent p {
+  margin: 0;
+  flex: 1;
+  line-height: 1.5;
+}
+
+.editButton {
+  background: none;
+  border: none;
+  color: #007bff;
+  cursor: pointer;
+  font-size: 0.9rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.editButton:hover {
+  background: rgba(0, 123, 255, 0.1);
+}
+
+.editGroup {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.editInput {
+  flex: 1;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 1rem;
+}
+
+.editTextarea {
+  flex: 1;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 1rem;
+  min-height: 100px;
+  resize: vertical;
+}
+
+.saveEditButton {
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.saveEditButton:hover {
+  background: #0069d9;
+}
+
+.actionBar {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 2rem;
+}
+
+.primaryButton {
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 0.75rem 2rem;
+  border-radius: 6px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.primaryButton:hover {
+  background: #0069d9;
+}
+
+.primaryButton:disabled {
+  background: #b0d0ff;
+  cursor: not-allowed;
+}
+
+.secondaryButton {
+  background: none;
+  color: #007bff;
+  border: 1px solid #007bff;
+  padding: 0.75rem 2rem;
+  border-radius: 6px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.secondaryButton:hover {
+  background: rgba(0, 123, 255, 0.1);
+}
+
+.errorMessage {
+  background: #f8d7da;
+  color: #721c24;
+  padding: 1rem;
+  border-radius: 6px;
+  margin-top: 1.5rem;
+}
+
+.successMessage {
+  background: #d4edda;
+  color: #155724;
+  padding: 1rem;
+  border-radius: 6px;
+  margin-top: 1.5rem;
+  text-align: center;
+}
+
+.spinner {
+  display: inline-block;
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: white;
+  animation: spin 1s ease-in-out infinite;
+  margin-right: 0.5rem;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loading {
+  text-align: center;
+  padding: 2rem;
+  font-size: 1.2rem;
+  color: #666;
+}
