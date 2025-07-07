@@ -28,7 +28,7 @@ const Nav = ({ user, handleLogOut }) => {
         <div className="logo-wrapper" alt="logo">
           <img
             className="logo"
-            src="https://avatars.dicebear.com/api/gridy/app.svg"
+            src="https://api.dicebear.com/9.x/adventurer/svg?seed=Sawyer&flip=true"
             alt="welcome banner"
           />
         </div>

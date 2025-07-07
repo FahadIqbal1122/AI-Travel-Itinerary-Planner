@@ -43,3 +43,49 @@
     grid-template-columns: 1fr;
   }
 }
+
+.activityHeader {
+  margin-bottom: 1rem;
+}
+
+.activityMeta {
+  display: flex;
+  gap: 1rem;
+  color: #666;
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+}
+
+.activityLocation {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.timeSlot {
+  margin: 1rem 0;
+  padding-left: 1.5rem;
+  position: relative;
+}
+
+.timeSlotLabel {
+  font-weight: 600;
+  color: #444;
+}
+
+.timeSlot p {
+  margin: 0.3rem 0 0 0;
+  color: #555;
+}
+
+.preferences {
+  margin-top: 0.5rem;
+  color: #666;
+  font-size: 0.95rem;
+}
+
+.activityDescription {
+  color: #444;
+  line-height: 1.6;
+  margin-bottom: 1rem;
+}
