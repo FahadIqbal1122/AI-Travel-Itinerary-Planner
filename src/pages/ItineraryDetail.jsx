@@ -52,6 +52,21 @@ const ItineraryDetail = () => {
     fetchItinerary()
   }, [id, navigate])
 
+  // Calculate date for each activity day based on start date
+  const getActivityDate = (startDate, dayNumber) => {
+    const date = new Date(startDate)
+    date.setDate(date.getDate() + (dayNumber - 1))
+    return date
+  }
+
+  const formatDate = (date) => {
+    return date.toLocaleDateString("en-US", {
+      weekday: "short",
+      month: "short",
+      day: "numeric",
+    })
+  }
+
   if (loading) return <div className={styles.loading}>Loading...</div>
   if (error) return <div className={styles.error}>{error}</div>
   if (!itinerary)
@@ -66,8 +81,8 @@ const ItineraryDetail = () => {
       <div className={styles.header}>
         <h1>{itinerary.destination}</h1>
         <div className={styles.dates}>
-          {new Date(itinerary.startDate).toLocaleDateString()} -{" "}
-          {new Date(itinerary.endDate).toLocaleDateString()}
+          {formatDate(new Date(itinerary.startDate))} -{" "}
+          {formatDate(new Date(itinerary.endDate))}
         </div>
         {itinerary.preferences?.length > 0 && (
           <div className={styles.preferences}>
@@ -77,7 +92,6 @@ const ItineraryDetail = () => {
       </div>
 
       <div className={styles.content}>
-        {/* Added back the description section */}
         <div className={styles.description}>
           <h2>Trip Overview</h2>
           <p>
@@ -88,54 +102,63 @@ const ItineraryDetail = () => {
 
         <div className={styles.activities}>
           <h2>Daily Itinerary</h2>
-          {parsedActivities.map((activity, index) => (
-            <div key={index} className={styles.activity}>
-              <div className={styles.activityHeader}>
-                <h3>
-                  Day {activity.day}: {activity.title}
-                </h3>
-                <div className={styles.activityMeta}>
-                  <span className={styles.activityDate}>
-                    {new Date(activity.date).toLocaleDateString()}
-                  </span>
-                  {activity.location && (
-                    <span className={styles.activityLocation}>
-                      📍 {activity.location}
+          {parsedActivities.map((activity, index) => {
+            const activityDate = getActivityDate(
+              itinerary.startDate,
+              activity.day
+            )
+
+            return (
+              <div key={index} className={styles.activity}>
+                <div className={styles.activityHeader}>
+                  <h3>
+                    Day {activity.day}: {activity.title}
+                  </h3>
+                  <div className={styles.activityMeta}>
+                    <span className={styles.activityDate}>
+                      {formatDate(activityDate)}
                     </span>
+                    {activity.location && (
+                      <span className={styles.activityLocation}>
+                        📍 {activity.location}
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {activity.description && (
+                  <p className={styles.activityDescription}>
+                    {activity.description}
+                  </p>
+                )}
+
+                <div className={styles.timeSlots}>
+                  {activity.timeSlots?.morning && (
+                    <div className={styles.timeSlot}>
+                      <span className={styles.timeSlotLabel}>☀️ Morning:</span>
+                      <p>{activity.timeSlots.morning}</p>
+                    </div>
+                  )}
+
+                  {activity.timeSlots?.afternoon && (
+                    <div className={styles.timeSlot}>
+                      <span className={styles.timeSlotLabel}>
+                        ⛅ Afternoon:
+                      </span>
+                      <p>{activity.timeSlots.afternoon}</p>
+                    </div>
+                  )}
+
+                  {activity.timeSlots?.evening && (
+                    <div className={styles.timeSlot}>
+                      <span className={styles.timeSlotLabel}>🌙 Evening:</span>
+                      <p>{activity.timeSlots.evening}</p>
+                    </div>
                   )}
                 </div>
               </div>
-
-              {activity.description && (
-                <p className={styles.activityDescription}>
-                  {activity.description}
-                </p>
-              )}
-
-              <div className={styles.timeSlots}>
-                {activity.timeSlots?.morning && (
-                  <div className={styles.timeSlot}>
-                    <span className={styles.timeSlotLabel}>☀️ Morning:</span>
-                    <p>{activity.timeSlots.morning}</p>
-                  </div>
-                )}
-
-                {activity.timeSlots?.afternoon && (
-                  <div className={styles.timeSlot}>
-                    <span className={styles.timeSlotLabel}>⛅ Afternoon:</span>
-                    <p>{activity.timeSlots.afternoon}</p>
-                  </div>
-                )}
-
-                {activity.timeSlots?.evening && (
-                  <div className={styles.timeSlot}>
-                    <span className={styles.timeSlotLabel}>🌙 Evening:</span>
-                    <p>{activity.timeSlots.evening}</p>
-                  </div>
-                )}
-              </div>
-            </div>
-          ))}
+            )
+          })}
         </div>
       </div>
     </div>
