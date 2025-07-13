@@ -6,7 +6,6 @@ import {
 } from "../services/ItineraryServices"
 import GenerateItineraryModal from "../components/GenerateItineraryModal"
 import styles from "./styles/itineraries.module.css"
-import { toast } from "react-toastify"
 
 const Itinerary = ({ user }) => {
   const navigate = useNavigate()
