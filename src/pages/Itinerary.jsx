@@ -1,6 +1,9 @@
 import { useState, useEffect } from "react"
 import { useNavigate, Link } from "react-router-dom"
-import { GetUserItineraries } from "../services/ItineraryServices"
+import {
+  GetUserItineraries,
+  DeleteItinerary,
+} from "../services/ItineraryServices"
 import GenerateItineraryModal from "../components/GenerateItineraryModal"
 import styles from "./styles/itineraries.module.css"
 
@@ -46,6 +49,21 @@ const Itinerary = ({ user }) => {
         user: user,
       },
     })
+  }
+
+  const handleDelete = async (itineraryId, e) => {
+    e.stopPropagation()
+    e.preventDefault()
+
+    try {
+      if (window.confirm("Are you sure you want to delete this itinerary?")) {
+        await DeleteItinerary(itineraryId)
+        setItineraries(itineraries.filter((it) => it._id !== itineraryId))
+      }
+    } catch (err) {
+      console.error("Delete failed:", err)
+      setError("Failed to delete itinerary")
+    }
   }
 
   return (
@@ -96,32 +114,40 @@ const Itinerary = ({ user }) => {
               key={itinerary._id}
               className={styles.cardLink}
             >
-              <div className={styles.itineraryCard}>
-                <h3>{itinerary.destination}</h3>
-                <div className={styles.dateRange}>
-                  <span className={styles.dateBadge}>
-                    {new Date(itinerary.startDate).toLocaleDateString()}
-                  </span>
-                  <span>→</span>
-                  <span className={styles.dateBadge}>
-                    {new Date(itinerary.endDate).toLocaleDateString()}
-                  </span>
-                </div>
-                {itinerary.activities?.length > 0 && (
-                  <div className={styles.activities}>
-                    <h4>Activities Preview</h4>
-                    {itinerary.activities.slice(0, 3).map((activity, i) => (
-                      <div key={i} className={styles.activityItem}>
-                        <span>{activity.title}</span>
-                        {activity.time && (
-                          <span className={styles.activityTime}>
-                            {activity.time}
-                          </span>
-                        )}
-                      </div>
-                    ))}
+              <div className={styles.cardContainer}>
+                <button
+                  onClick={(e) => handleDelete(itinerary._id, e)}
+                  className={styles.deleteButton}
+                >
+                  Delete
+                </button>
+                <div className={styles.itineraryCard}>
+                  <h3>{itinerary.destination}</h3>
+                  <div className={styles.dateRange}>
+                    <span className={styles.dateBadge}>
+                      {new Date(itinerary.startDate).toLocaleDateString()}
+                    </span>
+                    <span>→</span>
+                    <span className={styles.dateBadge}>
+                      {new Date(itinerary.endDate).toLocaleDateString()}
+                    </span>
                   </div>
-                )}
+                  {itinerary.activities?.length > 0 && (
+                    <div className={styles.activities}>
+                      <h4>Activities Preview</h4>
+                      {itinerary.activities.slice(0, 3).map((activity, i) => (
+                        <div key={i} className={styles.activityItem}>
+                          <span>{activity.title}</span>
+                          {activity.time && (
+                            <span className={styles.activityTime}>
+                              {activity.time}
+                            </span>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
             </Link>
           ))}

@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from "react"
 import { useParams, useNavigate } from "react-router-dom"
-import { GetItineraryById } from "../services/ItineraryServices"
+import {
+  GetItineraryById,
+  DeleteItinerary,
+} from "../services/ItineraryServices"
 import styles from "./styles/itineraryDetail.module.css"
 
 const ItineraryDetail = () => {
@@ -67,6 +70,20 @@ const ItineraryDetail = () => {
     })
   }
 
+  const handleDelete = async () => {
+    try {
+      if (window.confirm("Are you sure you want to delete this itinerary?")) {
+        await DeleteItinerary(id)
+        navigate("/itinerary", {
+          state: { message: "Itinerary deleted successfully" },
+        })
+      }
+    } catch (err) {
+      console.error("Delete failed:", err)
+      setError("Failed to delete itinerary")
+    }
+  }
+
   if (loading) return <div className={styles.loading}>Loading...</div>
   if (error) return <div className={styles.error}>{error}</div>
   if (!itinerary)
@@ -77,7 +94,9 @@ const ItineraryDetail = () => {
       <button onClick={() => navigate(-1)} className={styles.backButton}>
         &larr; Back to List
       </button>
-
+      <button onClick={handleDelete} className={styles.deleteButton}>
+        Delete Itinerary
+      </button>
       <div className={styles.header}>
         <h1>{itinerary.destination}</h1>
         <div className={styles.dates}>

@@ -67,10 +67,21 @@ export const SaveItinerary = async (data) => {
   }
 }
 
+export const DeleteItinerary = async (itineraryId) => {
+  try {
+    const response = await Client.delete(`/itineraries/${itineraryId}`)
+    return response.data
+  } catch (error) {
+    console.error("Error deleting itinerary:", error)
+    throw error
+  }
+}
+
 export default {
   GetUserItineraries,
   GetItineraryById,
   CreateItinerary,
   GenerateItinerary,
   SaveItinerary,
+  DeleteItinerary,
 }
