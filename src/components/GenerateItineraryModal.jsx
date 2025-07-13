@@ -48,7 +48,7 @@ const GenerateItineraryModal = ({ user, onClose, onSuccess }) => {
   return (
     <div className={styles.modalOverlay}>
       <div className={styles.modal}>
-        <button onClick={onClose} className={styles.closeButton}>
+        <button onClick={handleCloseModal} className={styles.closeButton}>
           &times;
         </button>
         <h2>Generate AI Itinerary</h2>

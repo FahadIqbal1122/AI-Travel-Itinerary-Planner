@@ -43,14 +43,6 @@ const Itinerary = ({ user }) => {
     setItineraries([newItinerary, ...itineraries])
   }
 
-  const handleGenerateClick = () => {
-    navigate("/generate", {
-      state: {
-        user: user,
-      },
-    })
-  }
-
   const handleDelete = async (itineraryId, e) => {
     e.stopPropagation()
     e.preventDefault()
@@ -78,7 +70,7 @@ const Itinerary = ({ user }) => {
             Create Manually
           </button>
           <button
-            onClick={() => handleGenerateClick(true)}
+            onClick={() => setShowGenerateModal(true)}
             className={styles.generateBtn}
           >
             Generate with AI
@@ -89,7 +81,7 @@ const Itinerary = ({ user }) => {
       {/* Modal */}
       {showGenerateModal && (
         <GenerateItineraryModal
-          userId={user._id}
+          user={user}
           onClose={() => setShowGenerateModal(false)}
           onSuccess={handleGenerateSuccess}
         />
