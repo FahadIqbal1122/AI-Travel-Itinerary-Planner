@@ -77,6 +77,16 @@ export const DeleteItinerary = async (itineraryId) => {
   }
 }
 
+export const UpdateItinerary = async (itineraryData) => {
+  try {
+    const response = await Client.put(`/itineraries/${itineraryData._id}`, itineraryData)
+    return response.data
+  } catch (error) {
+    console.error("Error updating itinerary:", error)
+    throw error
+  }
+}
+
 export default {
   GetUserItineraries,
   GetItineraryById,
@@ -84,4 +94,5 @@ export default {
   GenerateItinerary,
   SaveItinerary,
   DeleteItinerary,
+  UpdateItinerary
 }

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react"
 import { useNavigate, useLocation } from "react-router-dom"
-import { SaveItinerary } from "../services/ItineraryServices"
+import { SaveItinerary, UpdateItinerary } from "../services/ItineraryServices"
 import styles from "./styles/itineraryChat.module.css"
 
 const ItineraryChatEditor = () => {
@@ -12,11 +12,13 @@ const ItineraryChatEditor = () => {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
   const [saveSuccess, setSaveSuccess] = useState(false)
+  const [isEditingExisting, setIsEditingExisting] = useState(false)
 
   // Initialize with draft data
   useEffect(() => {
     if (state?.draft) {
       setDays(state.draft)
+      setIsEditingExisting(state.metadata?._id ? true : false)
     } else {
       navigate("/itinerary")
     }
@@ -41,11 +43,23 @@ const ItineraryChatEditor = () => {
       setLoading(true)
       setError(null)
 
-      const response = await SaveItinerary({
+      const itineraryData = {
         ...state.metadata,
         activities: days,
         itineraryText: JSON.stringify(days),
-      })
+      }
+
+      let response;
+      if (isEditingExisting) {
+        // Update existing itinerary
+        response = await UpdateItinerary({
+          ...itineraryData,
+          _id: state.metadata._id
+        })
+      } else {
+        // Create new itinerary
+        response = await SaveItinerary(itineraryData)
+      }
 
       setSaveSuccess(true)
       setTimeout(() => navigate(`/itineraries/${response._id}`), 1500)

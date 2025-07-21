@@ -84,6 +84,23 @@ const ItineraryDetail = () => {
     }
   }
 
+  const handleEdit = () => {
+    navigate("/itineraries/generate/edit", {
+      state: {
+        draft: parsedActivities,
+        metadata: {
+          _id: itinerary._id,
+          userId: itinerary.userId,
+          destination: itinerary.destination,
+          startDate: itinerary.startDate,
+          endDate: itinerary.endDate,
+          description: itinerary.description,
+          preferences: itinerary.preferences
+        }
+      }
+    })
+  }
+
   if (loading) return <div className={styles.loading}>Loading...</div>
   if (error) return <div className={styles.error}>{error}</div>
   if (!itinerary)
@@ -91,12 +108,20 @@ const ItineraryDetail = () => {
 
   return (
     <div className={styles.container}>
-      <button onClick={() => navigate(-1)} className={styles.backButton}>
-        &larr; Back to List
-      </button>
-      <button onClick={handleDelete} className={styles.deleteButton}>
-        Delete Itinerary
-      </button>
+      <div className={styles.actionButtons}>
+        <button onClick={() => navigate("/itinerary")} className={styles.backButton}>
+          &larr; Back to List
+        </button>
+        <div className={styles.rightButtons}>
+          <button onClick={handleEdit} className={styles.editButton}>
+            Edit Itinerary
+          </button>
+          <button onClick={handleDelete} className={styles.deleteButton}>
+            Delete Itinerary
+          </button>
+        </div>
+      </div>
+
       <div className={styles.header}>
         <h1>{itinerary.destination}</h1>
         <div className={styles.dates}>

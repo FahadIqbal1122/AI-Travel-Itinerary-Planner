@@ -29,26 +29,57 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.backButton {
-  background: none;
+.actionButtons {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.rightButtons {
+  display: flex;
+  gap: 10px;
+}
+
+.editButton {
+  background-color: #4CAF50;
+  color: white;
   border: none;
-  color: #007bff;
+  padding: 8px 16px;
+  border-radius: 4px;
   cursor: pointer;
-  margin-bottom: 1rem;
-  font-size: 1rem;
+  transition: background-color 0.3s;
+}
+
+.editButton:hover {
+  background-color: #45a049;
 }
 
 .deleteButton {
-  background: #dc3545;
+  background-color: #f44336;
   color: white;
-  padding: 0.75rem 1.5rem;
   border: none;
+  padding: 8px 16px;
   border-radius: 4px;
   cursor: pointer;
+  transition: background-color 0.3s;
 }
 
 .deleteButton:hover {
-  background: #c82333;
+  background-color: #d32f2f;
+}
+
+.backButton {
+  background-color: #2196F3;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.backButton:hover {
+  background-color: #0b7dda;
 }
 
 @media (max-width: 768px) {

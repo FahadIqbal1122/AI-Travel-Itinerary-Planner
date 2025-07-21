@@ -58,24 +58,39 @@ const Itinerary = ({ user }) => {
     }
   }
 
+  const handleEdit = (itinerary, e) => {
+    e.stopPropagation()
+    e.preventDefault()
+    navigate("/itineraries/generate/edit", {
+      state: {
+        draft: itinerary.activities,
+        metadata: {
+          _id: itinerary._id,
+          userId: itinerary.userId,
+          destination: itinerary.destination,
+          startDate: itinerary.startDate,
+          endDate: itinerary.endDate,
+          description: itinerary.description,
+          preferences: itinerary.preferences
+        }
+      }
+    })
+  }
+
   return (
     <div className={styles.container}>
       <div className={styles.header}>
         <h2>Your Trips</h2>
-        <div className={styles.actionButtons}>
-          <button
-            onClick={() => navigate("/create-itinerary")}
-            className={styles.createBtn}
-          >
-            Create Manually
-          </button>
-          <button
-            onClick={() => setShowGenerateModal(true)}
-            className={styles.generateBtn}
-          >
-            Generate with AI
-          </button>
-        </div>
+        {itineraries.length > 0 && (
+          <div className={styles.actionButtons}>
+            <button
+              onClick={() => setShowGenerateModal(true)}
+              className={styles.generateBtn}
+            >
+              Generate with AI
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Modal */}
@@ -92,11 +107,14 @@ const Itinerary = ({ user }) => {
           <h3>No itineraries found</h3>
           <p>Ready to plan your next adventure?</p>
           <button
-            onClick={() => navigate("/create-itinerary")}
-            className={styles.createBtn}
+            onClick={() => setShowGenerateModal(true)}
+            className={`${styles.generateBtn} ${styles.ctaButton}`}
           >
-            Create New Itinerary
+            Generate Your First Itinerary
           </button>
+          <p className={styles.helpText}>
+            Our AI will create a personalized travel plan based on your preferences
+          </p>
         </div>
       ) : (
         <div className={styles.itineraryList}>
@@ -107,12 +125,20 @@ const Itinerary = ({ user }) => {
               className={styles.cardLink}
             >
               <div className={styles.cardContainer}>
-                <button
-                  onClick={(e) => handleDelete(itinerary._id, e)}
-                  className={styles.deleteButton}
-                >
-                  Delete
-                </button>
+                <div className={styles.cardButtons}>
+                  <button
+                    onClick={(e) => handleEdit(itinerary, e)}
+                    className={styles.editButton}
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={(e) => handleDelete(itinerary._id, e)}
+                    className={styles.deleteButton}
+                  >
+                    Delete
+                  </button>
+                </div>
                 <div className={styles.itineraryCard}>
                   <h3>{itinerary.destination}</h3>
                   <div className={styles.dateRange}>
