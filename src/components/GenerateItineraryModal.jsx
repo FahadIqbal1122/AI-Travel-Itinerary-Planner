@@ -5,6 +5,12 @@ import styles from "./styles/generateItineraryModal.module.css"
 
 const GenerateItineraryModal = ({ user, onClose, onSuccess }) => {
   const navigate = useNavigate()
+
+    if (!user) {
+    navigate("/signin")
+    return null
+  }
+
   const [formData, setFormData] = useState({
     destination: "",
     startDate: "",

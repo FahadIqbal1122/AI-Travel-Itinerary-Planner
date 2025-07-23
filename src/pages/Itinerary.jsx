@@ -14,6 +14,12 @@ const Itinerary = ({ user }) => {
   const [error, setError] = useState(null)
   const [showGenerateModal, setShowGenerateModal] = useState(false)
 
+    useEffect(() => {
+    if (!user) {
+      navigate("/signin")
+    }
+  }, [user, navigate])
+
   useEffect(() => {
     const fetchUserItineraries = async () => {
       try {

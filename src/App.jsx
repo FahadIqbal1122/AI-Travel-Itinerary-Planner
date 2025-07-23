@@ -43,22 +43,17 @@ const App = () => {
           <Route path="/" element={<Home />} />
           <Route path="/signin" element={<SignIn setUser={setUser} />} />
           <Route path="/register" element={<Register />} />
-          <Route path="/itinerary" element={<Itinerary user={user} />} />
-          <Route path="/itineraries/:id" element={<ItineraryDetail />} />
-          <Route
-            path="/generate"
-            element={
-              <GenerateItineraryModal
-                user={user}
-                onClose={() => navigate("/itinerary")}
-              />
-            }
-          />
-          <Route
-            path="/itineraries/generate/edit"
-            element={<ItineraryChatEditor />}
-          />
-        </Routes>
+  <Route path="/itinerary" element={<Itinerary user={user} />} />
+  <Route path="/itineraries/:id" element={<ItineraryDetail />} />
+  <Route
+    path="/generate"
+    element={<GenerateItineraryModal user={user} onClose={() => navigate("/itinerary")} />}
+  />
+  <Route
+    path="/itineraries/generate/edit"
+    element={<ItineraryChatEditor user={user} />}
+  />
+</Routes>
       </main>
     </div>
   )
