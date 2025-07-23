@@ -21,23 +21,33 @@ const ItineraryChatEditor = () => {
   const [showChat, setShowChat] = useState(false)
   const chatContainerRef = useRef(null)
 
+  const calculateDayDates = (startDate, days) => {
+  if (!startDate) return days;
+  
+  const start = new Date(startDate);
+  return days.map((day, index) => ({
+    ...day,
+    date: new Date(start.setDate(start.getDate() + (index === 0 ? 0 : 1))).toISOString(),
+  }));
+};
+
   // Initialize with draft data
-  useEffect(() => {
-    if (state?.draft) {
-      setDays(state.draft)
-      setIsEditingExisting(state.metadata?._id ? true : false)
-      
-      // Initialize chat with the itinerary details
-      setChatMessages([
-        {
-          sender: "AI",
-          text: `I'm your travel assistant. I'll help you edit this ${state.draft.length}-day itinerary for ${state.metadata?.destination}. What changes would you like to make?`,
-        },
-      ])
-    } else {
-      navigate("/itinerary")
-    }
-  }, [state, navigate])
+useEffect(() => {
+  if (state?.draft) {
+    const daysWithDates = calculateDayDates(state.metadata?.startDate, state.draft);
+    setDays(daysWithDates);
+    setIsEditingExisting(state.metadata?._id ? true : false);
+    
+    setChatMessages([
+      {
+        sender: "AI",
+        text: `I'm your travel assistant. I'll help you edit this ${state.draft.length}-day itinerary for ${state.metadata?.destination}. What changes would you like to make?`,
+      },
+    ]);
+  } else {
+    navigate("/itinerary");
+  }
+}, [state, navigate]);
 
   // Auto-scroll chat to bottom
   useEffect(() => {
@@ -94,6 +104,23 @@ const ItineraryChatEditor = () => {
     }
   }
 
+const formatDate = (dateString) => {
+  if (!dateString) return "Date not set";
+  
+  try {
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return "Invalid date";
+    
+    return date.toLocaleDateString("en-US", {
+      weekday: "short",
+      month: "short",
+      day: "numeric",
+    });
+  } catch {
+    return "Invalid date";
+  }
+};
+
   const handleChatSubmit = async (e) => {
     e.preventDefault()
     if (!userInput.trim() || isAILoading) return
@@ -149,7 +176,7 @@ const ItineraryChatEditor = () => {
       })
 
       // Process AI response
-      const aiResponse = response.draft[0] // Assuming the response is structured similarly
+      const aiResponse = response.draft[0] 
       
       // Add AI response to chat
       setChatMessages(prev => [
@@ -248,7 +275,7 @@ const ItineraryChatEditor = () => {
 
             <div className={styles.dayMeta}>
               <span className={styles.dayDate}>
-                {new Date(currentDay.date).toLocaleDateString()}
+                {formatDate(currentDay.date)}
               </span>
               <span className={styles.dayLocation}>{currentDay.location}</span>
             </div>
