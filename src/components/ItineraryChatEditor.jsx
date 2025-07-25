@@ -13,6 +13,7 @@ const ItineraryChatEditor = () => {
   const [error, setError] = useState(null)
   const [saveSuccess, setSaveSuccess] = useState(false)
   const [isEditingExisting, setIsEditingExisting] = useState(false)
+  const [appliedChanges, setAppliedChanges] = useState([]); 
   
   // AI Chat State
   const [chatMessages, setChatMessages] = useState([])
@@ -40,6 +41,7 @@ useEffect(() => {
     
     setChatMessages([
       {
+        id: Date.now(),
         sender: "AI",
         text: `I'm your travel assistant. I'll help you edit this ${state.draft.length}-day itinerary for ${state.metadata?.destination}. What changes would you like to make?`,
       },
@@ -136,34 +138,33 @@ const formatDate = (dateString) => {
       // Prepare the AI prompt with context
       const currentDayData = days[activeDay]
       const prompt = `
-      Current Itinerary Details:
-      - Destination: ${state.metadata?.destination}
-      - Day ${currentDayData.day}: ${currentDayData.title}
-      - Description: ${currentDayData.description}
-      - Morning: ${currentDayData.timeSlots.morning}
-      - Afternoon: ${currentDayData.timeSlots.afternoon}
-      - Evening: ${currentDayData.timeSlots.evening}
-      - Location: ${currentDayData.location}
+    Current Itinerary Details (Day ${days[activeDay].day}):
+    - Title: ${days[activeDay].title}
+    - Description: ${days[activeDay].description}
+    - Location: ${days[activeDay].location}
+    - Morning: ${days[activeDay].timeSlots.morning}
+    - Afternoon: ${days[activeDay].timeSlots.afternoon}
+    - Evening: ${days[activeDay].timeSlots.evening}
 
-      User Request: ${userInput}
+    User Request: ${userInput}
 
-      Please suggest specific edits to the itinerary based on the user's request. 
-      Respond with clear, actionable changes in JSON format like this:
-      {
-        "action": "update",
-        "changes": {
-          "title": "New title if changed",
-          "description": "New description if changed",
-          "timeSlots": {
-            "morning": "New morning activity if changed",
-            "afternoon": "New afternoon activity if changed",
-            "evening": "New evening activity if changed"
-          },
-          "location": "New location if changed"
-        },
-        "message": "Explanation of changes"
-      }
-      `
+    IMPORTANT INSTRUCTIONS:
+    1. Only modify the specific field mentioned in the user's request
+    2. Keep all other fields EXACTLY as they are
+    3. If the request is unclear, ask for clarification
+
+    Respond with JSON containing ONLY the changed field(s):
+    {
+      "action": "update",
+      "changes": {
+        // ONLY INCLUDE THE FIELD BEING CHANGED
+        "title": "New title if requested",
+        // Don't include other fields unless explicitly requested
+      },
+      "message": "Explanation of changes"
+    }
+    `
+
 
       // Call the AI service
       const response = await GenerateItinerary({
@@ -178,6 +179,72 @@ const formatDate = (dateString) => {
       // Process AI response
       const aiResponse = response.draft[0] 
       
+
+
+      const userRequest = userInput.toLowerCase();
+
+// Validate the response contains only requested changes
+const validChanges = {
+  // Initialize all possible change fields as undefined
+  title: undefined,
+  description: undefined,
+  location: undefined,
+  timeSlots: {
+    morning: undefined,
+    afternoon: undefined,
+    evening: undefined
+  }
+};
+
+// Check each field individually
+if (userRequest.includes('title') && aiResponse.changes.title) {
+  validChanges.title = aiResponse.changes.title;
+}
+
+if (userRequest.includes('description') && aiResponse.changes.description) {
+  validChanges.description = aiResponse.changes.description;
+}
+
+if (userRequest.includes('location') && aiResponse.changes.location) {
+  validChanges.location = aiResponse.changes.location;
+}
+
+// Check time slots
+if (aiResponse.changes.timeSlots) {
+  if (userRequest.includes('morning') && aiResponse.changes.timeSlots.morning) {
+    validChanges.timeSlots.morning = aiResponse.changes.timeSlots.morning;
+  }
+  
+  if (userRequest.includes('afternoon') && aiResponse.changes.timeSlots.afternoon) {
+    validChanges.timeSlots.afternoon = aiResponse.changes.timeSlots.afternoon;
+  }
+  
+  if (userRequest.includes('evening') && aiResponse.changes.timeSlots.evening) {
+    validChanges.timeSlots.evening = aiResponse.changes.timeSlots.evening;
+  }
+  
+  // Remove timeSlots object if no changes were approved
+  if (
+    !validChanges.timeSlots.morning &&
+    !validChanges.timeSlots.afternoon &&
+    !validChanges.timeSlots.evening
+  ) {
+    validChanges.timeSlots = undefined;
+  }
+}
+
+// Clean up the changes object to remove undefined fields
+const cleanedChanges = Object.fromEntries(
+  Object.entries(validChanges).filter(([_, value]) => {
+    if (typeof value === 'object' && value !== null) {
+      return Object.values(value).some(v => v !== undefined);
+    }
+    return value !== undefined;
+  })
+);
+
+
+
       // Add AI response to chat
       setChatMessages(prev => [
         ...prev,
@@ -205,14 +272,14 @@ const formatDate = (dateString) => {
     const updatedDays = [...days]
     const dayToUpdate = updatedDays[activeDay]
 
-    if (changes.title) dayToUpdate.title = changes.title
-    if (changes.description) dayToUpdate.description = changes.description
-    if (changes.location) dayToUpdate.location = changes.location
-    
-    if (changes.timeSlots) {
-      if (changes.timeSlots.morning) dayToUpdate.timeSlots.morning = changes.timeSlots.morning
-      if (changes.timeSlots.afternoon) dayToUpdate.timeSlots.afternoon = changes.timeSlots.afternoon
-      if (changes.timeSlots.evening) dayToUpdate.timeSlots.evening = changes.timeSlots.evening
+  if (changes.title !== undefined) dayToUpdate.title = changes.title
+  if (changes.description !== undefined) dayToUpdate.description = changes.description
+  if (changes.location !== undefined) dayToUpdate.location = changes.location
+  
+  if (changes.timeSlots) {
+    if (changes.timeSlots.morning !== undefined) dayToUpdate.timeSlots.morning = changes.timeSlots.morning
+    if (changes.timeSlots.afternoon !== undefined) dayToUpdate.timeSlots.afternoon = changes.timeSlots.afternoon
+    if (changes.timeSlots.evening !== undefined) dayToUpdate.timeSlots.evening = changes.timeSlots.evening
     }
 
     setDays(updatedDays)
@@ -451,36 +518,27 @@ const formatDate = (dateString) => {
                   <div key={index} className={`${styles.message} ${styles[msg.sender]}`}>
                     <div className={styles.messageContent}>
                       <p>{msg.text}</p>
-                      {msg.changes && (
-                        <div className={styles.aiChanges}>
-                          <button 
-                            onClick={() => applyAIChanges(msg.changes)}
-                            className={styles.applyChangesButton}
-                          >
-                            Apply These Changes
-                          </button>
-                          <div className={styles.changesPreview}>
-                            {msg.changes.title && (
-                              <p><strong>Title:</strong> {msg.changes.title}</p>
-                            )}
-                            {msg.changes.description && (
-                              <p><strong>Description:</strong> {msg.changes.description}</p>
-                            )}
-                            {msg.changes.timeSlots?.morning && (
-                              <p><strong>Morning:</strong> {msg.changes.timeSlots.morning}</p>
-                            )}
-                            {msg.changes.timeSlots?.afternoon && (
-                              <p><strong>Afternoon:</strong> {msg.changes.timeSlots.afternoon}</p>
-                            )}
-                            {msg.changes.timeSlots?.evening && (
-                              <p><strong>Evening:</strong> {msg.changes.timeSlots.evening}</p>
-                            )}
-                            {msg.changes.location && (
-                              <p><strong>Location:</strong> {msg.changes.location}</p>
-                            )}
-                          </div>
-                        </div>
-                      )}
+{msg.changes && !appliedChanges.includes(msg.id) && ( // Only show if not applied
+  <div className={styles.aiChanges}>
+    <div className={styles.changesPreview}>
+      <h4>Proposed Changes:</h4>
+      {Object.entries(msg.changes).map(([field, value]) => (
+        <p key={field}>
+          <strong>{field}:</strong> {value}
+        </p>
+      ))}
+    </div>
+    <button 
+      onClick={() => {
+        applyAIChanges(msg.changes);
+        setAppliedChanges(prev => [...prev, msg.id]); // Mark as applied
+      }}
+      className={styles.applyChangesButton}
+    >
+      Confirm Changes
+    </button>
+  </div>
+)}
                     </div>
                   </div>
                 ))}
