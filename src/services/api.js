@@ -1,6 +1,9 @@
 import Axios from "axios"
 
-export const BASE_URL = "https://ai-travel-itinerary-planner-backend.onrender.com"
+export const BASE_URL =
+  import.meta.env.MODE === "development"
+    ? "http://localhost:3001"  // Local backend
+    : "https://ai-travel-itinerary-planner-backend.onrender.com";  // Live backend
 
 const Client = Axios.create({ baseURL: BASE_URL })
 

@@ -1,11 +1,10 @@
-/* Add to your itineraries.module.css */
 .modalOverlay {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 4, 17, 0.8); /* var(--primary-bg) with opacity */
+  background: rgba(0, 4, 17, 0.8); 
   display: flex;
   justify-content: center;
   align-items: center;
@@ -90,8 +89,8 @@
 }
 
 .tag {
-  background: #e1efe6; /* var(--secondary-bg) */
-  color: #000411; /* var(--primary-bg) */
+  background: #e1efe6;
+  color: #000411; 
   padding: 0.25rem 0.75rem;
   border-radius: 50px;
   font-size: 0.85rem;
@@ -143,7 +142,6 @@
   text-align: center;
 }
 
-/* Responsive adjustments */
 @media (max-width: 768px) {
   .modal {
     padding: 1.5rem;

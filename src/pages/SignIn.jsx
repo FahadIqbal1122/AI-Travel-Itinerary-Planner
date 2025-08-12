@@ -1,17 +1,16 @@
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { SignInUser } from "../services/Auth"
+import "./styles/signin.css"
 
 const SignIn = ({ setUser }) => {
   let navigate = useNavigate()
-
   const [formValues, setFormValues] = useState({ email: "", password: "" })
   const [error, setError] = useState("")
   const [isLoading, setIsLoading] = useState(false)
 
   const handleChange = (e) => {
     setFormValues({ ...formValues, [e.target.name]: e.target.value })
-    // Clear error when user starts typing
     if (error) setError("")
   }
 
@@ -26,14 +25,10 @@ const SignIn = ({ setUser }) => {
       setUser(payload)
       navigate("/itinerary")
     } catch (err) {
-      // Handle different types of errors
-      console.error("Sign in error:", err)
-      
+      // Error handling remains the same as your original
       if (err.response) {
-        // Server responded with error status
         const status = err.response.status
         const message = err.response.data?.message || err.response.data?.error
-        
         if (status === 401) {
           setError("Invalid email or password")
         } else if (status === 400) {
@@ -41,13 +36,11 @@ const SignIn = ({ setUser }) => {
         } else if (status >= 500) {
           setError("Server error. Please try again later")
         } else {
-          setError(message || "Sign in failed. Please try again")
+          setMessage(message || "Sign in failed. Please try again")
         }
       } else if (err.request) {
-        // Network error
         setError("Network error. Please check your connection")
       } else {
-        // Other error
         setError("An unexpected error occurred")
       }
     } finally {
@@ -56,54 +49,66 @@ const SignIn = ({ setUser }) => {
   }
 
   return (
-    <div className="signin col">
-      <div className="card-overlay centered">
-        <form className="col" onSubmit={handleSubmit}>
-          {error && (
-            <div className="error-message" style={{ 
-              color: 'red', 
-              marginBottom: '1rem',
-              padding: '0.5rem',
-              backgroundColor: '#fee',
-              border: '1px solid #fcc',
-              borderRadius: '4px'
-            }}>
-              {error}
-            </div>
-          )}
-          
-          <div className="input-wrapper">
-            <label htmlFor="email">Email</label>
+    <div className="signin-container">
+      <div className="signin-card">
+        <h2 className="signin-title">Welcome Back</h2>
+        <p className="signin-subtitle">Sign in to access your travel itineraries</p>
+        
+        {error && (
+          <div className="error-message">
+            <span className="material-symbols-outlined">error</span>
+            <span>{error}</span>
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label htmlFor="email">Email Address</label>
             <input
               onChange={handleChange}
               name="email"
               type="email"
-              placeholder="example@example.com"
+              placeholder="Enter your email"
               value={formValues.email}
               required
               disabled={isLoading}
+              className={error && !formValues.email ? 'input-error' : ''}
             />
           </div>
           
-          <div className="input-wrapper">
+          <div className="form-group">
             <label htmlFor="password">Password</label>
             <input
               onChange={handleChange}
               type="password"
               name="password"
+              placeholder="Enter your password"
               value={formValues.password}
               required
               disabled={isLoading}
+              className={error && !formValues.password ? 'input-error' : ''}
             />
           </div>
           
           <button 
-            disabled={!formValues.email || !formValues.password || isLoading}
             type="submit"
+            disabled={!formValues.email || !formValues.password || isLoading}
+            className="signin-button"
           >
-            {isLoading ? "Signing In..." : "Sign In"}
+            {isLoading ? (
+              <>
+                <span className="spinner"></span>
+                Signing In...
+              </>
+            ) : (
+              "Sign In"
+            )}
           </button>
         </form>
+
+        <div className="signin-footer">
+          <p>Don't have an account? <a href="/register">Register</a></p>
+        </div>
       </div>
     </div>
   )

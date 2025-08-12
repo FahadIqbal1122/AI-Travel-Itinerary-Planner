@@ -1,39 +1,43 @@
 import { Link } from "react-router-dom"
+import "./styles/navbar.css" 
 
 const Nav = ({ user, handleLogOut }) => {
   let userOptions
   if (user) {
     userOptions = (
-      <nav>
-        <h3>Welcome {user.email}!</h3>
-        <Link to="/itinerary">Itinerary</Link>
-        <Link onClick={handleLogOut} to="/">
-          Sign Out
-        </Link>
+      <nav className="nav-links">
+        <Link to="/itinerary" className="nav-link">My Itinerary</Link>
+        <div className="user-greeting">
+          <span>Welcome, {user.name}!</span>
+          <Link onClick={handleLogOut} to="/" className="nav-link sign-out">
+            Sign Out
+          </Link>
+        </div>
       </nav>
     )
   }
 
   const publicOptions = (
-    <nav>
-      <Link to="/">Home</Link>
-      <Link to="/register">Register</Link>
-      <Link to="/signin">Sign In</Link>
+    <nav className="nav-links">
+      <Link to="/register" className="nav-link">Register</Link>
+      <Link to="/signin" className="nav-link">Sign In</Link>
     </nav>
   )
 
   return (
-    <header>
-      <Link to="/">
-        <div className="logo-wrapper" alt="logo">
-          <img
-            className="logo"
-            src="https://api.dicebear.com/9.x/adventurer/svg?seed=Sawyer&flip=true"
-            alt="welcome banner"
-          />
-        </div>
-      </Link>
-      {user ? userOptions : publicOptions}
+    <header className="navbar">
+      <div className="nav-container">
+        <Link to="/" className="logo-link">
+          <div className="logo-wrapper">
+            <img
+              className="logo"
+              src="https://api.dicebear.com/9.x/adventurer/svg?seed=Sawyer&flip=true"
+              alt="App logo"
+            />
+          </div>
+        </Link>
+        {user ? userOptions : publicOptions}
+      </div>
     </header>
   )
 }

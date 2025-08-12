@@ -1,6 +1,7 @@
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { RegisterUser } from "../services/Auth"
+import "./styles/register.css"
 
 const Register = () => {
   let navigate = useNavigate()
@@ -97,12 +98,10 @@ const Register = () => {
     const domain = email.split('@')[1]?.toLowerCase()
     if (!domain) return false
     
-    // Check if it's a blocked domain
     if (blockedDomains.includes(domain)) {
       return false
     }
     
-    // Additional checks for suspicious patterns
     if (domain.includes('temp') || domain.includes('fake') || domain.includes('trash')) {
       return false
     }
@@ -139,7 +138,6 @@ const Register = () => {
         if (strength.score < 3) {
           fieldErrors.password = "Password is too weak"
         }
-        // Check confirm password match if it exists
         if (formValues.confirmPassword && value !== formValues.confirmPassword) {
           fieldErrors.confirmPassword = "Passwords do not match"
         } else if (formValues.confirmPassword && value === formValues.confirmPassword) {
@@ -160,8 +158,6 @@ const Register = () => {
   const handleChange = (e) => {
     const { name, value } = e.target
     setFormValues({ ...formValues, [name]: value })
-    
-    // Real-time validation
     validateField(name, value)
   }
 
@@ -209,7 +205,6 @@ const Register = () => {
         confirmPassword: "",
       })
       
-      // Show success message or redirect
       navigate("/signin", { 
         state: { message: "Registration successful! Please sign in." }
       })
@@ -244,7 +239,6 @@ const Register = () => {
     }
   }
 
-  // Check if form is valid
   const isFormValid = () => {
     return (
       formValues.name.length >= 2 &&
@@ -257,23 +251,20 @@ const Register = () => {
   }
 
   return (
-    <div className="signin col">
-      <div className="card-overlay centered">
-        <form className="col" onSubmit={handleSubmit}>
-          {errors.general && (
-            <div className="error-message" style={{ 
-              color: 'red', 
-              marginBottom: '1rem',
-              padding: '0.5rem',
-              backgroundColor: '#fee',
-              border: '1px solid #fcc',
-              borderRadius: '4px'
-            }}>
-              {errors.general}
-            </div>
-          )}
+        <div className="auth-container">
+      <div className="auth-card">
+        <h2 className="auth-title">Create Account</h2>
+        <p className="auth-subtitle">Join us to start planning your travels</p>
+        
+        {errors.general && (
+          <div className="auth-error">
+            <span className="material-symbols-outlined">error</span>
+            <span>{errors.general}</span>
+          </div>
+        )}
 
-          <div className="input-wrapper">
+        <form onSubmit={handleSubmit}>
+          <div className="auth-form-group">
             <label htmlFor="name">Full Name</label>
             <input
               onChange={handleChange}
@@ -283,16 +274,12 @@ const Register = () => {
               value={formValues.name}
               required
               disabled={isLoading}
-              style={errors.name ? { borderColor: 'red' } : {}}
+              className={errors.name ? 'auth-input-error' : ''}
             />
-            {errors.name && (
-              <span style={{ color: 'red', fontSize: '0.8rem' }}>
-                {errors.name}
-              </span>
-            )}
+            {errors.name && <span className="auth-error-text">{errors.name}</span>}
           </div>
 
-          <div className="input-wrapper">
+          <div className="auth-form-group">
             <label htmlFor="email">Email Address</label>
             <input
               onChange={handleChange}
@@ -302,99 +289,79 @@ const Register = () => {
               value={formValues.email}
               required
               disabled={isLoading}
-              style={errors.email ? { borderColor: 'red' } : {}}
+              className={errors.email ? 'auth-input-error' : ''}
             />
-            {errors.email && (
-              <span style={{ color: 'red', fontSize: '0.8rem' }}>
-                {errors.email}
-              </span>
-            )}
+            {errors.email && <span className="auth-error-text">{errors.email}</span>}
           </div>
 
-          <div className="input-wrapper">
+          <div className="auth-form-group">
             <label htmlFor="password">Password</label>
             <input
               onChange={handleChange}
               type="password"
               name="password"
+              placeholder="Create a password"
               value={formValues.password}
               required
               disabled={isLoading}
-              style={errors.password ? { borderColor: 'red' } : {}}
+              className={errors.password ? 'auth-input-error' : ''}
             />
             
-            {/* Password Strength Indicator */}
+            {/* Password Strength Meter */}
             {formValues.password && (
-              <div style={{ marginTop: '0.5rem' }}>
-                <div style={{
-                  height: '4px',
-                  backgroundColor: '#eee',
-                  borderRadius: '2px',
-                  overflow: 'hidden'
-                }}>
-                  <div style={{
-                    height: '100%',
-                    width: `${(passwordStrength.score / 5) * 100}%`,
-                    backgroundColor: passwordStrength.color,
-                    transition: 'all 0.3s ease'
-                  }} />
+              <div className="auth-password-strength">
+                <div className="auth-strength-meter">
+                  <div 
+                    className="auth-strength-bar" 
+                    style={{
+                      width: `${(passwordStrength.score / 5) * 100}%`,
+                      backgroundColor: passwordStrength.color
+                    }}
+                  />
                 </div>
                 {passwordStrength.feedback.length > 0 && (
-                  <div style={{ fontSize: '0.75rem', marginTop: '0.25rem', color: '#666' }}>
+                  <div className="auth-strength-feedback">
                     Suggestions: {passwordStrength.feedback.join(', ')}
                   </div>
                 )}
               </div>
             )}
             
-            {errors.password && (
-              <span style={{ color: 'red', fontSize: '0.8rem' }}>
-                {errors.password}
-              </span>
-            )}
+            {errors.password && <span className="auth-error-text">{errors.password}</span>}
           </div>
 
-          <div className="input-wrapper">
+          <div className="auth-form-group">
             <label htmlFor="confirmPassword">Confirm Password</label>
             <input
               onChange={handleChange}
               type="password"
               name="confirmPassword"
+              placeholder="Confirm your password"
               value={formValues.confirmPassword}
               required
               disabled={isLoading}
-              style={errors.confirmPassword ? { borderColor: 'red' } : {}}
+              className={errors.confirmPassword ? 'auth-input-error' : ''}
             />
-            {errors.confirmPassword && (
-              <span style={{ color: 'red', fontSize: '0.8rem' }}>
-                {errors.confirmPassword}
-              </span>
-            )}
+            {errors.confirmPassword && <span className="auth-error-text">{errors.confirmPassword}</span>}
           </div>
 
           <button
             type="submit"
             disabled={!isFormValid() || isLoading}
-            style={{
-              opacity: (!isFormValid() || isLoading) ? 0.6 : 1,
-              cursor: (!isFormValid() || isLoading) ? 'not-allowed' : 'pointer'
-            }}
+            className="auth-button"
           >
-            {isLoading ? "Creating Account..." : "Create Account"}
+            {isLoading ? (
+              <>
+                <span className="auth-spinner"></span>
+                Creating Account...
+              </>
+            ) : (
+              "Create Account"
+            )}
           </button>
 
-          <div style={{ marginTop: '1rem', textAlign: 'center', fontSize: '0.9rem' }}>
-            Already have an account?{' '}
-            <span 
-              onClick={() => navigate('/signin')}
-              style={{ 
-                color: '#007bff', 
-                cursor: 'pointer', 
-                textDecoration: 'underline' 
-              }}
-            >
-              Sign In
-            </span>
+          <div className="auth-footer">
+            <p>Already have an account? <a href="/signin">Sign In</a></p>
           </div>
         </form>
       </div>
