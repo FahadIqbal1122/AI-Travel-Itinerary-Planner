@@ -1,12 +1,15 @@
-import { useState } from "react"
+import React, { useState, Suspense } from "react"
 import { useNavigate } from "react-router-dom"
 import { GenerateItinerary } from "../services/ItineraryServices"
 import styles from "./styles/generateItineraryModal.module.css"
 
-const GenerateItineraryModal = ({ user, onClose, onSuccess }) => {
+// Lazy load DestinationAutocomplete
+const DestinationAutocomplete = React.lazy(() => import("./DestinationAutocomplete"))
+
+const GenerateItineraryModal = ({ user, onClose }) => {
   const navigate = useNavigate()
 
-    if (!user) {
+  if (!user) {
     navigate("/signin")
     return null
   }
@@ -17,19 +20,27 @@ const GenerateItineraryModal = ({ user, onClose, onSuccess }) => {
     endDate: "",
     preferences: [],
   })
+  const [selectedPlace, setSelectedPlace] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    if (!selectedPlace) {
+      setError("Please select a destination from the suggestions")
+      return
+    }
+
+    setLoading(true)
+    setError(null)
+
     try {
       const response = await GenerateItinerary({
         ...formData,
         userId: user._id,
         isDraft: true,
+        destinationPlace: selectedPlace,
       })
-
-      console.log("API Response:", response)
 
       if (response.draft) {
         navigate("/itineraries/generate/edit", {
@@ -42,39 +53,49 @@ const GenerateItineraryModal = ({ user, onClose, onSuccess }) => {
         throw new Error("No draft data received")
       }
     } catch (err) {
-      console.error("Navigation failed:", err)
       setError(err.message)
+    } finally {
+      setLoading(false)
     }
   }
 
-  const handleCloseModal = () => {
-    onClose()
+  const handleDestinationChange = (destination) => {
+    setFormData((prev) => ({ ...prev, destination }))
+    setSelectedPlace(null)  // reset selected place on manual input
+    if (error) setError(null)  // clear error on new input
   }
 
   return (
     <div className={styles.modalOverlay}>
       <div className={styles.modal}>
-        <button onClick={handleCloseModal} className={styles.closeButton}>
+        <button onClick={onClose} className={styles.closeButton}>
           &times;
         </button>
         <h2>Generate AI Itinerary</h2>
         {error && <p className={styles.error}>{error}</p>}
+
         <form onSubmit={handleSubmit}>
-          <input
-            type="text"
-            placeholder="Destination (e.g., Paris)"
-            value={formData.destination}
-            onChange={(e) =>
-              setFormData({ ...formData, destination: e.target.value })
-            }
-            required
-          />
+          <Suspense fallback={<input type="text" placeholder="Loading destination..." disabled />}>
+            <DestinationAutocomplete
+              value={formData.destination}
+              onChange={handleDestinationChange}
+              onSelect={(place) => {
+  setSelectedPlace(place)
+  setFormData((prev) => ({
+    ...prev,
+    destination: place ? (place.address || "") : "",
+  }))
+  if (error) setError(null)
+}}
+            />
+          </Suspense>
+
           <div className={styles.dateInputs}>
             <input
               type="date"
               value={formData.startDate}
               onChange={(e) =>
-                setFormData({ ...formData, startDate: e.target.value })
+                setFormData((prev) => ({ ...prev, startDate: e.target.value }))
               }
               required
             />
@@ -83,11 +104,12 @@ const GenerateItineraryModal = ({ user, onClose, onSuccess }) => {
               type="date"
               value={formData.endDate}
               onChange={(e) =>
-                setFormData({ ...formData, endDate: e.target.value })
+                setFormData((prev) => ({ ...prev, endDate: e.target.value }))
               }
               required
             />
           </div>
+
           <div className={styles.preferences}>
             <label>Preferences (comma-separated):</label>
             <input
@@ -102,6 +124,7 @@ const GenerateItineraryModal = ({ user, onClose, onSuccess }) => {
               }
             />
           </div>
+
           <button type="submit" disabled={loading}>
             {loading ? "Generating..." : "Generate with AI"}
           </button>
