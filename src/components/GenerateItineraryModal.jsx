@@ -1,4 +1,4 @@
-import React, { useState, Suspense } from "react"
+import React, { useEffect, useState, useRef, Suspense } from "react"
 import { useNavigate } from "react-router-dom"
 import { GenerateItinerary } from "../services/ItineraryServices"
 import styles from "./styles/generateItineraryModal.module.css"
@@ -23,12 +23,15 @@ const GenerateItineraryModal = ({ user, onClose }) => {
   const [selectedPlace, setSelectedPlace] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
+  const [touchedDestination, setTouchedDestination] = useState(false);
+  const destinationInputRef = useRef(null);
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    if (!selectedPlace) {
-      setError("Please select a destination from the suggestions")
-      return
+   if (!selectedPlace || !formData.destination) {
+      setTouchedDestination(true);
+      setError("Please select a valid destination from the suggestions");
+      return;
     }
 
     setLoading(true)
@@ -59,11 +62,20 @@ const GenerateItineraryModal = ({ user, onClose }) => {
     }
   }
 
-  const handleDestinationChange = (destination) => {
-    setFormData((prev) => ({ ...prev, destination }))
-    setSelectedPlace(null)  // reset selected place on manual input
-    if (error) setError(null)  // clear error on new input
-  }
+   const handleDestinationChange = (destination) => {
+    setFormData((prev) => ({ ...prev, destination }));
+    setTouchedDestination(true);
+    if (!destination) {
+      setSelectedPlace(null);
+    }
+    if (error) setError(null);
+  };
+
+    useEffect(() => {
+    if (selectedPlace && error) {
+      setError(null);
+    }
+  }, [selectedPlace, error]);
 
   return (
     <div className={styles.modalOverlay}>
