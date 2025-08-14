@@ -123,167 +123,208 @@ const formatDate = (dateString) => {
   }
 };
 
-  const handleChatSubmit = async (e) => {
-    e.preventDefault()
-    if (!userInput.trim() || isAILoading) return
+const handleChatSubmit = async (e) => {
+  e.preventDefault()
+  if (!userInput.trim() || isAILoading) return
 
-    try {
-      setIsAILoading(true)
+  try {
+    setIsAILoading(true)
+    
+    // Add user message to chat with unique ID
+    const userMessageId = Date.now()
+    const newUserMessage = { 
+      id: userMessageId,
+      sender: "user", 
+      text: userInput 
+    }
+    setChatMessages(prev => [...prev, newUserMessage])
+    const currentUserInput = userInput // Store before clearing
+    setUserInput("")
+
+    // Prepare the AI prompt with context
+    const currentDayData = days[activeDay]
+    const prompt = `
+Current Itinerary Details (Day ${days[activeDay].day}):
+- Title: ${days[activeDay].title}
+- Description: ${days[activeDay].description}
+- Location: ${days[activeDay].location}
+- Morning: ${days[activeDay].timeSlots.morning}
+- Afternoon: ${days[activeDay].timeSlots.afternoon}
+- Evening: ${days[activeDay].timeSlots.evening}
+
+User Request: ${currentUserInput}
+
+IMPORTANT INSTRUCTIONS:
+1. Only modify the specific field mentioned in the user's request
+2. Keep all other fields EXACTLY as they are
+3. If the request is unclear, ask for clarification
+
+Respond with JSON containing ONLY the changed field(s):
+{
+  "action": "update",
+  "changes": {
+    // ONLY INCLUDE THE FIELD BEING CHANGED
+    "title": "New title if requested",
+    "timeSlots": {
+      "morning": "New morning activity if requested"
+    }
+    // Don't include other fields unless explicitly requested
+  },
+  "message": "Explanation of changes"
+}
+`
+
+    // Call the AI service
+    const response = await GenerateItinerary({
+      destination: state.metadata?.destination,
+      startDate: state.metadata?.startDate,
+      endDate: state.metadata?.endDate,
+      preferences: state.metadata?.preferences || [],
+      prompt: prompt,
+      isDraft: true
+    })
+
+    // Process AI response
+    const aiResponse = response.draft[0] 
+    console.log("AI Response:", aiResponse) // Debug log
+
+    // Debug logs
+    console.log("User input:", currentUserInput)
+    console.log("AI Response:", aiResponse)
+    
+    // More flexible validation - let's trust the AI's changes for now
+    // and make validation more permissive
+    const userRequest = currentUserInput.toLowerCase();
+    let validChanges = {};
+
+    // Check if AI response has changes
+    if (aiResponse && aiResponse.changes) {
+      console.log("AI Changes received:", aiResponse.changes)
       
-      // Add user message to chat
-      const newUserMessage = { sender: "user", text: userInput }
-      setChatMessages(prev => [...prev, newUserMessage])
-      setUserInput("")
-
-      // Prepare the AI prompt with context
-      const currentDayData = days[activeDay]
-      const prompt = `
-    Current Itinerary Details (Day ${days[activeDay].day}):
-    - Title: ${days[activeDay].title}
-    - Description: ${days[activeDay].description}
-    - Location: ${days[activeDay].location}
-    - Morning: ${days[activeDay].timeSlots.morning}
-    - Afternoon: ${days[activeDay].timeSlots.afternoon}
-    - Evening: ${days[activeDay].timeSlots.evening}
-
-    User Request: ${userInput}
-
-    IMPORTANT INSTRUCTIONS:
-    1. Only modify the specific field mentioned in the user's request
-    2. Keep all other fields EXACTLY as they are
-    3. If the request is unclear, ask for clarification
-
-    Respond with JSON containing ONLY the changed field(s):
-    {
-      "action": "update",
-      "changes": {
-        // ONLY INCLUDE THE FIELD BEING CHANGED
-        "title": "New title if requested",
-        // Don't include other fields unless explicitly requested
-      },
-      "message": "Explanation of changes"
-    }
-    `
-
-
-      // Call the AI service
-      const response = await GenerateItinerary({
-        destination: state.metadata?.destination,
-        startDate: state.metadata?.startDate,
-        endDate: state.metadata?.endDate,
-        preferences: state.metadata?.preferences || [],
-        prompt: prompt,
-        isDraft: true
-      })
-
-      // Process AI response
-      const aiResponse = response.draft[0] 
+      // More flexible keyword matching
+      const containsTitle = userRequest.includes('title') || userRequest.includes('name') || userRequest.includes('call');
+      const containsDescription = userRequest.includes('description') || userRequest.includes('about') || userRequest.includes('overview');
+      const containsLocation = userRequest.includes('location') || userRequest.includes('place') || userRequest.includes('where');
+      const containsMorning = userRequest.includes('morning') || userRequest.includes('am') || userRequest.includes('early');
+      const containsAfternoon = userRequest.includes('afternoon') || userRequest.includes('pm') || userRequest.includes('lunch');
+      const containsEvening = userRequest.includes('evening') || userRequest.includes('night') || userRequest.includes('dinner');
       
+      // More permissive validation
+      if (containsTitle && aiResponse.changes.title) {
+        validChanges.title = aiResponse.changes.title;
+      }
 
+      if (containsDescription && aiResponse.changes.description) {
+        validChanges.description = aiResponse.changes.description;
+      }
 
-      const userRequest = userInput.toLowerCase();
+      if (containsLocation && aiResponse.changes.location) {
+        validChanges.location = aiResponse.changes.location;
+      }
 
-// Validate the response contains only requested changes
-const validChanges = {
-  // Initialize all possible change fields as undefined
-  title: undefined,
-  description: undefined,
-  location: undefined,
-  timeSlots: {
-    morning: undefined,
-    afternoon: undefined,
-    evening: undefined
-  }
-};
-
-// Check each field individually
-if (userRequest.includes('title') && aiResponse.changes.title) {
-  validChanges.title = aiResponse.changes.title;
-}
-
-if (userRequest.includes('description') && aiResponse.changes.description) {
-  validChanges.description = aiResponse.changes.description;
-}
-
-if (userRequest.includes('location') && aiResponse.changes.location) {
-  validChanges.location = aiResponse.changes.location;
-}
-
-// Check time slots
-if (aiResponse.changes.timeSlots) {
-  if (userRequest.includes('morning') && aiResponse.changes.timeSlots.morning) {
-    validChanges.timeSlots.morning = aiResponse.changes.timeSlots.morning;
-  }
-  
-  if (userRequest.includes('afternoon') && aiResponse.changes.timeSlots.afternoon) {
-    validChanges.timeSlots.afternoon = aiResponse.changes.timeSlots.afternoon;
-  }
-  
-  if (userRequest.includes('evening') && aiResponse.changes.timeSlots.evening) {
-    validChanges.timeSlots.evening = aiResponse.changes.timeSlots.evening;
-  }
-  
-  // Remove timeSlots object if no changes were approved
-  if (
-    !validChanges.timeSlots.morning &&
-    !validChanges.timeSlots.afternoon &&
-    !validChanges.timeSlots.evening
-  ) {
-    validChanges.timeSlots = undefined;
-  }
-}
-
-// Clean up the changes object to remove undefined fields
-const cleanedChanges = Object.fromEntries(
-  Object.entries(validChanges).filter(([_, value]) => {
-    if (typeof value === 'object' && value !== null) {
-      return Object.values(value).some(v => v !== undefined);
-    }
-    return value !== undefined;
-  })
-);
-
-
-
-      // Add AI response to chat
-      setChatMessages(prev => [
-        ...prev,
-        {
-          sender: "AI",
-          text: aiResponse.message || "Here are the suggested changes:",
-          changes: aiResponse.changes
+      // Check time slots with more flexible matching
+      if (aiResponse.changes.timeSlots) {
+        const timeSlotChanges = {};
+        
+        if (containsMorning && aiResponse.changes.timeSlots.morning) {
+          timeSlotChanges.morning = aiResponse.changes.timeSlots.morning;
         }
-      ])
-    } catch (err) {
-      console.error("AI Error:", err)
-      setChatMessages(prev => [
-        ...prev,
-        {
-          sender: "AI",
-          text: "Sorry, I encountered an error processing your request. Please try again."
+        
+        if (containsAfternoon && aiResponse.changes.timeSlots.afternoon) {
+          timeSlotChanges.afternoon = aiResponse.changes.timeSlots.afternoon;
         }
-      ])
-    } finally {
-      setIsAILoading(false)
+        
+        if (containsEvening && aiResponse.changes.timeSlots.evening) {
+          timeSlotChanges.evening = aiResponse.changes.timeSlots.evening;
+        }
+        
+        // Only include timeSlots if there are actual changes
+        if (Object.keys(timeSlotChanges).length > 0) {
+          validChanges.timeSlots = timeSlotChanges;
+        }
+      }
+      
+      // If no specific field keywords found, include all changes (fallback)
+      if (Object.keys(validChanges).length === 0 && Object.keys(aiResponse.changes).length > 0) {
+        console.log("No specific keywords found, including all AI changes")
+        validChanges = aiResponse.changes;
+      }
     }
+    
+    console.log("Valid changes after filtering:", validChanges)
+
+    // Generate unique ID for AI message
+    const aiMessageId = Date.now() + 1
+    
+    // Add AI response to chat
+    setChatMessages(prev => [
+      ...prev,
+      {
+        id: aiMessageId,
+        sender: "AI",
+        text: aiResponse.message || "Here are the suggested changes:",
+        changes: validChanges // Use validated changes
+      }
+    ])
+
+  } catch (err) {
+    console.error("AI Error:", err)
+    setChatMessages(prev => [
+      ...prev,
+      {
+        id: Date.now(),
+        sender: "AI",
+        text: "Sorry, I encountered an error processing your request. Please try again."
+      }
+    ])
+  } finally {
+    setIsAILoading(false)
   }
+}
 
-  const applyAIChanges = (changes) => {
-    const updatedDays = [...days]
-    const dayToUpdate = updatedDays[activeDay]
-
-  if (changes.title !== undefined) dayToUpdate.title = changes.title
-  if (changes.description !== undefined) dayToUpdate.description = changes.description
-  if (changes.location !== undefined) dayToUpdate.location = changes.location
+const applyAIChanges = (changes) => {
+  console.log("Applying changes:", changes) // Debug log
   
+  const updatedDays = [...days]
+  const dayToUpdate = updatedDays[activeDay]
+
+  // Apply changes only for defined fields
+  if (changes.title !== undefined) {
+    dayToUpdate.title = changes.title
+    console.log("Updated title to:", changes.title)
+  }
+  
+  if (changes.description !== undefined) {
+    dayToUpdate.description = changes.description
+    console.log("Updated description to:", changes.description)
+  }
+  
+  if (changes.location !== undefined) {
+    dayToUpdate.location = changes.location
+    console.log("Updated location to:", changes.location)
+  }
+  
+  // Handle timeSlots changes
   if (changes.timeSlots) {
-    if (changes.timeSlots.morning !== undefined) dayToUpdate.timeSlots.morning = changes.timeSlots.morning
-    if (changes.timeSlots.afternoon !== undefined) dayToUpdate.timeSlots.afternoon = changes.timeSlots.afternoon
-    if (changes.timeSlots.evening !== undefined) dayToUpdate.timeSlots.evening = changes.timeSlots.evening
+    if (changes.timeSlots.morning !== undefined) {
+      dayToUpdate.timeSlots.morning = changes.timeSlots.morning
+      console.log("Updated morning to:", changes.timeSlots.morning)
     }
-
-    setDays(updatedDays)
+    
+    if (changes.timeSlots.afternoon !== undefined) {
+      dayToUpdate.timeSlots.afternoon = changes.timeSlots.afternoon
+      console.log("Updated afternoon to:", changes.timeSlots.afternoon)
+    }
+    
+    if (changes.timeSlots.evening !== undefined) {
+      dayToUpdate.timeSlots.evening = changes.timeSlots.evening
+      console.log("Updated evening to:", changes.timeSlots.evening)
+    }
   }
+
+  console.log("Final updated day:", dayToUpdate) // Debug log
+  setDays(updatedDays)
+}
 
   if (!days.length)
     return <div className={styles.loading}>Loading itinerary...</div>
@@ -518,20 +559,40 @@ const cleanedChanges = Object.fromEntries(
                   <div key={index} className={`${styles.message} ${styles[msg.sender]}`}>
                     <div className={styles.messageContent}>
                       <p>{msg.text}</p>
-{msg.changes && !appliedChanges.includes(msg.id) && ( // Only show if not applied
+
+{msg.changes && !appliedChanges.includes(msg.id) && (
   <div className={styles.aiChanges}>
     <div className={styles.changesPreview}>
       <h4>Proposed Changes:</h4>
-      {Object.entries(msg.changes).map(([field, value]) => (
-        <p key={field}>
-          <strong>{field}:</strong> {value}
-        </p>
-      ))}
+      {Object.entries(msg.changes).map(([field, value]) => {
+        // Handle nested timeSlots object
+        if (field === 'timeSlots' && typeof value === 'object') {
+          return (
+            <div key={field}>
+              <strong>Time Slots:</strong>
+              <ul style={{ marginLeft: '20px', listStyle: 'disc' }}>
+                {Object.entries(value).map(([timeSlot, activity]) => (
+                  <li key={timeSlot}>
+                    <strong>{timeSlot.charAt(0).toUpperCase() + timeSlot.slice(1)}:</strong> {activity}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )
+        }
+        
+        // Handle regular fields
+        return (
+          <p key={field}>
+            <strong>{field.charAt(0).toUpperCase() + field.slice(1)}:</strong> {value}
+          </p>
+        )
+      })}
     </div>
     <button 
       onClick={() => {
         applyAIChanges(msg.changes);
-        setAppliedChanges(prev => [...prev, msg.id]); // Mark as applied
+        setAppliedChanges(prev => [...prev, msg.id]);
       }}
       className={styles.applyChangesButton}
     >
