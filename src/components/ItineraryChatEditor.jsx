@@ -138,10 +138,9 @@ const handleChatSubmit = async (e) => {
       text: userInput 
     }
     setChatMessages(prev => [...prev, newUserMessage])
-    const currentUserInput = userInput // Store before clearing
+    const currentUserInput = userInput 
     setUserInput("")
 
-    // Prepare the AI prompt with context
     const currentDayData = days[activeDay]
     const prompt = `
 Current Itinerary Details (Day ${days[activeDay].day}):
@@ -187,13 +186,7 @@ Respond with JSON containing ONLY the changed field(s):
     // Process AI response
     const aiResponse = response.draft[0] 
     console.log("AI Response:", aiResponse) // Debug log
-
-    // Debug logs
-    console.log("User input:", currentUserInput)
-    console.log("AI Response:", aiResponse)
     
-    // More flexible validation - let's trust the AI's changes for now
-    // and make validation more permissive
     const userRequest = currentUserInput.toLowerCase();
     let validChanges = {};
 
@@ -201,7 +194,6 @@ Respond with JSON containing ONLY the changed field(s):
     if (aiResponse && aiResponse.changes) {
       console.log("AI Changes received:", aiResponse.changes)
       
-      // More flexible keyword matching
       const containsTitle = userRequest.includes('title') || userRequest.includes('name') || userRequest.includes('call');
       const containsDescription = userRequest.includes('description') || userRequest.includes('about') || userRequest.includes('overview');
       const containsLocation = userRequest.includes('location') || userRequest.includes('place') || userRequest.includes('where');
@@ -209,7 +201,6 @@ Respond with JSON containing ONLY the changed field(s):
       const containsAfternoon = userRequest.includes('afternoon') || userRequest.includes('pm') || userRequest.includes('lunch');
       const containsEvening = userRequest.includes('evening') || userRequest.includes('night') || userRequest.includes('dinner');
       
-      // More permissive validation
       if (containsTitle && aiResponse.changes.title) {
         validChanges.title = aiResponse.changes.title;
       }
@@ -222,7 +213,6 @@ Respond with JSON containing ONLY the changed field(s):
         validChanges.location = aiResponse.changes.location;
       }
 
-      // Check time slots with more flexible matching
       if (aiResponse.changes.timeSlots) {
         const timeSlotChanges = {};
         
@@ -238,13 +228,11 @@ Respond with JSON containing ONLY the changed field(s):
           timeSlotChanges.evening = aiResponse.changes.timeSlots.evening;
         }
         
-        // Only include timeSlots if there are actual changes
         if (Object.keys(timeSlotChanges).length > 0) {
           validChanges.timeSlots = timeSlotChanges;
         }
       }
       
-      // If no specific field keywords found, include all changes (fallback)
       if (Object.keys(validChanges).length === 0 && Object.keys(aiResponse.changes).length > 0) {
         console.log("No specific keywords found, including all AI changes")
         validChanges = aiResponse.changes;
@@ -263,7 +251,7 @@ Respond with JSON containing ONLY the changed field(s):
         id: aiMessageId,
         sender: "AI",
         text: aiResponse.message || "Here are the suggested changes:",
-        changes: validChanges // Use validated changes
+        changes: validChanges 
       }
     ])
 

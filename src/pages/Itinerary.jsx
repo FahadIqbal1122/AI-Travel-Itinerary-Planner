@@ -5,6 +5,7 @@ import {
   DeleteItinerary,
 } from "../services/ItineraryServices"
 import GenerateItineraryModal from "../components/GenerateItineraryModal"
+import ConfirmationModal from "../components/ConfirmationModal"
 import styles from "./styles/itineraries.module.css"
 
 const Itinerary = ({ user }) => {
@@ -13,8 +14,10 @@ const Itinerary = ({ user }) => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [showGenerateModal, setShowGenerateModal] = useState(false)
+  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false)
+  const [itineraryToDelete, setItineraryToDelete] = useState(null)
 
-    useEffect(() => {
+  useEffect(() => {
     if (!user) {
       navigate("/signin")
     }
@@ -49,19 +52,29 @@ const Itinerary = ({ user }) => {
     setItineraries([newItinerary, ...itineraries])
   }
 
-  const handleDelete = async (itineraryId, e) => {
+  const handleDeleteClick = (itinerary, e) => {
     e.stopPropagation()
     e.preventDefault()
+    setItineraryToDelete(itinerary)
+    setShowDeleteConfirmation(true)
+  }
+
+  const handleDeleteConfirm = async () => {
+    if (!itineraryToDelete) return
 
     try {
-      if (window.confirm("Are you sure you want to delete this itinerary?")) {
-        await DeleteItinerary(itineraryId)
-        setItineraries(itineraries.filter((it) => it._id !== itineraryId))
-      }
+      await DeleteItinerary(itineraryToDelete._id)
+      setItineraries(itineraries.filter((it) => it._id !== itineraryToDelete._id))
+      setItineraryToDelete(null)
     } catch (err) {
       console.error("Delete failed:", err)
       setError("Failed to delete itinerary")
     }
+  }
+
+  const handleDeleteCancel = () => {
+    setShowDeleteConfirmation(false)
+    setItineraryToDelete(null)
   }
 
   const handleEdit = (itinerary, e) => {
@@ -99,7 +112,7 @@ const Itinerary = ({ user }) => {
         )}
       </div>
 
-      {/* Modal */}
+      {/* Generate Modal */}
       {showGenerateModal && (
         <GenerateItineraryModal
           user={user}
@@ -107,6 +120,18 @@ const Itinerary = ({ user }) => {
           onSuccess={handleGenerateSuccess}
         />
       )}
+
+      {/* Delete Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={showDeleteConfirmation}
+        onClose={handleDeleteCancel}
+        onConfirm={handleDeleteConfirm}
+        title="Delete Itinerary"
+        message={`Are you sure you want to delete "${itineraryToDelete?.destination}" itinerary? This action cannot be undone.`}
+        confirmText="Delete"
+        cancelText="Cancel"
+        type="danger"
+      />
 
       {itineraries.length === 0 ? (
         <div className={styles.emptyState}>
@@ -139,7 +164,7 @@ const Itinerary = ({ user }) => {
                     Edit
                   </button>
                   <button
-                    onClick={(e) => handleDelete(itinerary._id, e)}
+                    onClick={(e) => handleDeleteClick(itinerary, e)}
                     className={styles.deleteButton}
                   >
                     Delete

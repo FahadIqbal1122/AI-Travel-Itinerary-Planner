@@ -1,115 +1,195 @@
 .container {
-  max-width: 800px;
-  margin: 2rem auto;
-  padding: 0 1rem;
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 0 1rem 2rem;
 }
 
 .header {
+  background: #f8f9fa;
+  padding: 1.5rem;
   margin-bottom: 2rem;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.headerContent {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.headerText {
+  flex: 1;
+  min-width: 300px;
+  text-align: center;
+}
+
+.header h1 {
+  color: #333;
+  margin-bottom: 0.5rem;
 }
 
 .dates {
-  color: #666;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
   font-size: 1.1rem;
+  opacity: 0.9;
+  margin-top: 0.5rem;
+}
+
+.preferences {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 0.8rem 1.2rem;
+  border-radius: 24px;
+  margin-top: 1.5rem;
+  font-size: 0.9rem;
+  display: inline-block;
 }
 
 .content {
-  display: grid;
-  gap: 2rem;
-  grid-template-columns: 1fr 2fr;
+  padding: 0 1rem;
 }
 
-.activity {
+.descriptionCard {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  margin-bottom: 2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  border: 1px solid #eee;
+}
+
+.descriptionCard h2 {
+  margin-top: 0;
+  color: #444;
+  font-size: 1.4rem;
+}
+
+.itinerarySection h2 {
+  font-size: 1.4rem;
+  margin-bottom: 1.5rem;
+  color: #444;
+}
+
+.timeline {
+  position: relative;
+  padding-left: 70px; 
+}
+
+
+.timeline:before {
+  content: '';
+  position: absolute;
+  left: 20px; 
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: #e0e0e0;
+}
+
+.timelineItem {
+  position: relative;
+  margin-bottom: 2rem;
+  min-height: 60px; 
+}
+
+.timelineMarker {
+  position: absolute;
+  left: -70px; 
+  top: 0;
+  width: 60px;
+  z-index: 2; 
+}
+
+.dayCircle {
+  background: #6c757d;
+  color: white;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+  font-weight: bold;
+  font-size: 0.9rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  position: relative; 
+}
+
+
+.date {
+  font-size: 0.8rem;
+  color: #666;
+  margin-top: 0.5rem;
+  white-space: nowrap;
+}
+
+.activityCard {
   background: white;
   padding: 1.5rem;
   border-radius: 8px;
-  margin-bottom: 1rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  border: 1px solid #eee;
+  position: relative;
+  z-index: 1; 
+  margin-left: 10px; 
 }
 
-.actionButtons {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 20px;
-}
-
-.rightButtons {
-  display: flex;
-  gap: 10px;
-}
-
-.editButton {
-  background-color: #4CAF50;
-  color: white;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-.editButton:hover {
-  background-color: #45a049;
-}
-
-.deleteButton {
-  background-color: #f44336;
-  color: white;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-.deleteButton:hover {
-  background-color: #d32f2f;
-}
-
-.backButton {
-  background-color: #2196F3;
-  color: white;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-.backButton:hover {
-  background-color: #0b7dda;
-}
-
-@media (max-width: 768px) {
-  .content {
-    grid-template-columns: 1fr;
-  }
+.activityCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .activityHeader {
   margin-bottom: 1rem;
 }
 
-.activityMeta {
-  display: flex;
-  gap: 1rem;
-  color: #666;
-  font-size: 0.9rem;
-  margin-top: 0.5rem;
+.activityHeader h3 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.2rem;
+  color: #222;
 }
 
 .activityLocation {
   display: flex;
   align-items: center;
-  gap: 0.3rem;
+  gap: 0.5rem;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.activityDescription {
+  color: #555;
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+}
+
+.timeSlots {
+  display: grid;
+  gap: 1.5rem;
 }
 
 .timeSlot {
-  margin: 1rem 0;
-  padding-left: 1.5rem;
-  position: relative;
+  background: #f8f9fa;
+  padding: 1rem;
+  border-radius: 6px;
+  margin-bottom: 0.5rem;
+  border-left: 3px solid #6c757d; 
+}
+
+.timeSlotHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.3rem;
+}
+
+.timeSlotIcon {
+  color: #6c757d; 
 }
 
 .timeSlotLabel {
@@ -118,18 +198,151 @@
 }
 
 .timeSlot p {
-  margin: 0.3rem 0 0 0;
+  margin: 0;
   color: #555;
+  line-height: 1.5;
 }
 
-.preferences {
-  margin-top: 0.5rem;
-  color: #666;
-  font-size: 0.95rem;
+.backButton, .editButton, .deleteButton {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
 }
 
-.activityDescription {
-  color: #444;
-  line-height: 1.6;
+.backButton {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+}
+
+.backButton:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.editButton {
+  background: #4CAF50;
+  color: white;
+}
+
+.editButton:hover {
+  background: #3e8e41;
+}
+
+.deleteButton {
+  background: #f44336;
+  color: white;
+}
+
+.deleteButton:hover {
+  background: #d32f2f;
+}
+
+.actionButtons {
+  display: flex;
+  gap: 0.8rem;
+}
+
+.loadingContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 60vh;
+  gap: 1rem;
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 5px solid #f3f3f3;
+  border-top: 5px solid #4a6bff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.errorContainer, .notFoundContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 60vh;
+  text-align: center;
+  padding: 0 1rem;
+}
+
+.errorIcon {
+  font-size: 3rem;
   margin-bottom: 1rem;
+}
+
+.errorContainer h3, .notFoundContainer h3 {
+  color: #d32f2f;
+  margin-bottom: 0.5rem;
+}
+
+.retryButton {
+  margin-top: 1.5rem;
+  padding: 0.8rem 1.5rem;
+  background: #4a6bff;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.retryButton:hover {
+  background: #3a5bef;
+}
+
+@media (max-width: 768px) {
+  .headerContent {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .headerText {
+    order: 2;
+    margin-top: 1rem;
+  }
+  
+  .backButton {
+    order: 1;
+    align-self: flex-start;
+  }
+  
+  .actionButtons {
+    order: 3;
+    margin-top: 1.5rem;
+    justify-content: flex-end;
+  }
+  
+.timeline {
+    padding-left: 50px;
+  }
+  
+  .timeline:before {
+    left: 15px;
+  }
+  
+  .timelineMarker {
+    left: -50px;
+    width: 40px;
+  }
+  
+  .dayCircle {
+    width: 40px;
+    height: 40px;
+
+  }
 }

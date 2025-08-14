@@ -5,6 +5,7 @@ import {
   DeleteItinerary,
 } from "../services/ItineraryServices"
 import styles from "./styles/itineraryDetail.module.css"
+import { FiArrowLeft, FiEdit2, FiTrash2, FiMapPin, FiCalendar, FiSun, FiCloud, FiMoon } from "react-icons/fi"
 
 const ItineraryDetail = () => {
   const { id } = useParams()
@@ -27,7 +28,6 @@ const ItineraryDetail = () => {
 
         setItinerary(data)
 
-        // Parse itineraryText if it exists, otherwise use activities
         if (data.itineraryText) {
           try {
             setParsedActivities(JSON.parse(data.itineraryText))
@@ -55,7 +55,6 @@ const ItineraryDetail = () => {
     fetchItinerary()
   }, [id, navigate])
 
-  // Calculate date for each activity day based on start date
   const getActivityDate = (startDate, dayNumber) => {
     const date = new Date(startDate)
     date.setDate(date.getDate() + (dayNumber - 1))
@@ -101,42 +100,78 @@ const ItineraryDetail = () => {
     })
   }
 
-  if (loading) return <div className={styles.loading}>Loading...</div>
-  if (error) return <div className={styles.error}>{error}</div>
-  if (!itinerary)
-    return <div className={styles.notFound}>Itinerary not found</div>
+  if (loading) return (
+    <div className={styles.loadingContainer}>
+      <div className={styles.spinner}></div>
+      <p>Loading your itinerary...</p>
+    </div>
+  )
+  
+  if (error) return (
+    <div className={styles.errorContainer}>
+      <div className={styles.errorIcon}>⚠️</div>
+      <h3>Something went wrong</h3>
+      <p>{error}</p>
+      <button 
+        onClick={() => window.location.reload()} 
+        className={styles.retryButton}
+      >
+        Try Again
+      </button>
+    </div>
+  )
+  
+  if (!itinerary) return (
+    <div className={styles.notFoundContainer}>
+      <h3>Itinerary not found</h3>
+      <p>The itinerary you're looking for doesn't exist or may have been deleted.</p>
+      <button 
+        onClick={() => navigate("/itinerary")} 
+        className={styles.backButton}
+      >
+        <FiArrowLeft /> Back to Itineraries
+      </button>
+    </div>
+  )
 
   return (
     <div className={styles.container}>
-      <div className={styles.actionButtons}>
-        <button onClick={() => navigate("/itinerary")} className={styles.backButton}>
-          &larr; Back to List
-        </button>
-        <div className={styles.rightButtons}>
-          <button onClick={handleEdit} className={styles.editButton}>
-            Edit Itinerary
-          </button>
-          <button onClick={handleDelete} className={styles.deleteButton}>
-            Delete Itinerary
-          </button>
-        </div>
-      </div>
-
       <div className={styles.header}>
-        <h1>{itinerary.destination}</h1>
-        <div className={styles.dates}>
-          {formatDate(new Date(itinerary.startDate))} -{" "}
-          {formatDate(new Date(itinerary.endDate))}
+        <div className={styles.headerContent}>
+          <button 
+            onClick={() => navigate("/itinerary")} 
+            className={styles.backButton}
+          >
+            <FiArrowLeft /> Back to List
+          </button>
+          
+          <div className={styles.headerText}>
+            <h1>{itinerary.destination}</h1>
+            <div className={styles.dates}>
+              <FiCalendar /> {formatDate(new Date(itinerary.startDate))} -{" "}
+              {formatDate(new Date(itinerary.endDate))}
+            </div>
+          </div>
+          
+          <div className={styles.actionButtons}>
+            <button onClick={handleEdit} className={styles.editButton}>
+              <FiEdit2 /> Edit
+            </button>
+            <button onClick={handleDelete} className={styles.deleteButton}>
+              <FiTrash2 /> Delete
+            </button>
+          </div>
         </div>
+        
         {itinerary.preferences?.length > 0 && (
           <div className={styles.preferences}>
-            <strong>Preferences:</strong> {itinerary.preferences.join(", ")}
+            <strong>Travel Preferences:</strong> {itinerary.preferences.join(", ")}
           </div>
         )}
       </div>
 
       <div className={styles.content}>
-        <div className={styles.description}>
+        <div className={styles.descriptionCard}>
           <h2>Trip Overview</h2>
           <p>
             {itinerary.description ||
@@ -144,65 +179,72 @@ const ItineraryDetail = () => {
           </p>
         </div>
 
-        <div className={styles.activities}>
-          <h2>Daily Itinerary</h2>
-          {parsedActivities.map((activity, index) => {
-            const activityDate = getActivityDate(
-              itinerary.startDate,
-              activity.day
-            )
+         <div className={styles.itinerarySection}>
+      <h2>Daily Itinerary</h2>
+      
+      <div className={styles.timeline}>
+        {parsedActivities.map((activity, index) => {
+          const activityDate = getActivityDate(itinerary.startDate, activity.day)
+          
+          return (
+            <div key={index} className={styles.timelineItem}>
+              <div className={styles.timelineMarker}>
+                <div className={styles.dayCircle}>Day {activity.day}</div>
+                <div className={styles.date}>{formatDate(activityDate)}</div>
+              </div>
+              
+              <div className={styles.activityCard}>
+                    <div className={styles.activityHeader}>
+                      <h3>{activity.title}</h3>
+                      {activity.location && (
+                        <div className={styles.activityLocation}>
+                          <FiMapPin /> {activity.location}
+                        </div>
+                      )}
+                    </div>
 
-            return (
-              <div key={index} className={styles.activity}>
-                <div className={styles.activityHeader}>
-                  <h3>
-                    Day {activity.day}: {activity.title}
-                  </h3>
-                  <div className={styles.activityMeta}>
-                    <span className={styles.activityDate}>
-                      {formatDate(activityDate)}
-                    </span>
-                    {activity.location && (
-                      <span className={styles.activityLocation}>
-                        📍 {activity.location}
-                      </span>
+                    {activity.description && (
+                      <p className={styles.activityDescription}>
+                        {activity.description}
+                      </p>
                     )}
+
+                    <div className={styles.timeSlots}>
+                      {activity.timeSlots?.morning && (
+                        <div className={styles.timeSlot}>
+                          <div className={styles.timeSlotHeader}>
+                            <FiSun className={styles.timeSlotIcon} />
+                            <span className={styles.timeSlotLabel}>Morning</span>
+                          </div>
+                          <p>{activity.timeSlots.morning}</p>
+                        </div>
+                      )}
+
+                      {activity.timeSlots?.afternoon && (
+                        <div className={styles.timeSlot}>
+                          <div className={styles.timeSlotHeader}>
+                            <FiCloud className={styles.timeSlotIcon} />
+                            <span className={styles.timeSlotLabel}>Afternoon</span>
+                          </div>
+                          <p>{activity.timeSlots.afternoon}</p>
+                        </div>
+                      )}
+
+                      {activity.timeSlots?.evening && (
+                        <div className={styles.timeSlot}>
+                          <div className={styles.timeSlotHeader}>
+                            <FiMoon className={styles.timeSlotIcon} />
+                            <span className={styles.timeSlotLabel}>Evening</span>
+                          </div>
+                          <p>{activity.timeSlots.evening}</p>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
-
-                {activity.description && (
-                  <p className={styles.activityDescription}>
-                    {activity.description}
-                  </p>
-                )}
-
-                <div className={styles.timeSlots}>
-                  {activity.timeSlots?.morning && (
-                    <div className={styles.timeSlot}>
-                      <span className={styles.timeSlotLabel}>☀️ Morning:</span>
-                      <p>{activity.timeSlots.morning}</p>
-                    </div>
-                  )}
-
-                  {activity.timeSlots?.afternoon && (
-                    <div className={styles.timeSlot}>
-                      <span className={styles.timeSlotLabel}>
-                        ⛅ Afternoon:
-                      </span>
-                      <p>{activity.timeSlots.afternoon}</p>
-                    </div>
-                  )}
-
-                  {activity.timeSlots?.evening && (
-                    <div className={styles.timeSlot}>
-                      <span className={styles.timeSlotLabel}>🌙 Evening:</span>
-                      <p>{activity.timeSlots.evening}</p>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )
-          })}
+              )
+            })}
+          </div>
         </div>
       </div>
     </div>
